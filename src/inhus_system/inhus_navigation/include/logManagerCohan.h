@@ -7,6 +7,7 @@
 #include "geometry_msgs/Twist.h"
 #include "geometry_msgs/PoseStamped.h"
 #include "nav_msgs/Odometry.h"
+#include "nav_msgs/OccupancyGrid.h"
 #include "actionlib_msgs/GoalStatusArray.h"
 #include <fstream>
 #include <math.h>
@@ -23,7 +24,8 @@ public:
 	void odomRCB(const nav_msgs::Odometry::ConstPtr& msg);
 	void odomHCB(const nav_msgs::Odometry::ConstPtr& msg);
 	void robotGoalCB(const geometry_msgs::PoseStamped::ConstPtr& msg);
-	void robotGoalStatusCB(const actionlib_msgs::GoalStatusArray::ConstPtr& msg);
+  void robotGoalStatusCB(const actionlib_msgs::GoalStatusArray::ConstPtr& msg);
+	void costmapCB(const nav_msgs::OccupancyGrid::ConstPtr& msg);
 
 private:
 	ros::NodeHandle nh_;
@@ -35,7 +37,7 @@ private:
 	bool goal_received_;
 	bool goal_done_;
 
-	int id_;
+	int id_, map_id_;
 
 	ofstream log_file_r_;
 	ofstream log_file_h_;
@@ -43,7 +45,7 @@ private:
 	ros::Subscriber sub_odom_r_;
 	ros::Subscriber sub_odom_h_;
 
-	ros::Subscriber sub_robot_goal_status_;
+	ros::Subscriber sub_robot_goal_status_, sub_costmap_r_;
 	ros::Subscriber sub_robot_goal_;
 };
 
