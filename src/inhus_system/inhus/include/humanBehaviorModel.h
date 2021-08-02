@@ -14,7 +14,7 @@
 #include "nav_msgs/Path.h"
 #include "nav_msgs/GetPlan.h"
 #include "inhus/Goal.h"
-#include "inhus/Signal.h"
+#include "std_srvs/Empty.h"
 #include "inhus/ActionBool.h"
 #include "inhus_navigation/PlaceRobot.h"
 #include "std_msgs/Int32.h"
@@ -54,7 +54,7 @@ private:
 	ros::ServiceServer server_check_conflict_;
 	bool srvCheckConflict(inhus::ActionBool::Request &req, inhus::ActionBool::Response &res);
 	ros::ServiceServer server_init_conflict_;
-	bool srvInitCheckConflict(inhus::Signal::Request &req, inhus::Signal::Response &res);
+	bool srvInitCheckConflict(std_srvs::Empty::Request &req, std_srvs::Empty::Response &res);
 
 	// Service clients
 	ros::ServiceClient client_cancel_goal_and_stop_;
@@ -65,7 +65,7 @@ private:
 	// srv
 	inhus_navigation::PlaceRobot srv_place_robot_hm_;
 	nav_msgs::GetPlan srv_get_plan_;
-	inhus::Signal srv_signal_;
+	std_srvs::Empty srv_signal_;
 
 	// Publishers
 	ros::Publisher pub_log_; std_msgs::String msg_;
@@ -131,13 +131,14 @@ private:
 
 ////////// METHODS //////////
 
-	inhus::Goal chooseGoal(bool random);
+	GoalArea chooseGoal(bool random);
+	void showGoals();
 	void readGoalsFromXML();
 	void attNonStop();
 	void attRandom();
 	void attStopLook();
 	void attHarass();
-	void publishGoal(inhus::Goal& goal);
+	void publishGoal(GoalArea goal);
 	bool testObstacleView(geometry_msgs::Pose2D A_real, geometry_msgs::Pose2D B_real);
 	bool testFOV(geometry_msgs::Pose2D A, geometry_msgs::Pose2D B, float fov);
 	void updateRobotOnMap();
@@ -198,11 +199,11 @@ private:
 	ros::ServiceServer server_place_robot_;
 	bool srvPlaceRobotHM(inhus_navigation::PlaceRobot::Request& req, inhus_navigation::PlaceRobot::Response& res);
 	ros::ServiceServer server_update_robot_map_;
-	bool srvUpdateRobotMap(inhus::Signal::Request& req, inhus::Signal::Response& res);
+	bool srvUpdateRobotMap(std_srvs::Empty::Request& req, std_srvs::Empty::Response& res);
 
 	// Services //
 	inhus_navigation::PlaceRobot srv_place_robot_;
-	inhus::Signal srv_signal_;
+	std_srvs::Empty srv_signal_;
 
 	//// Variables ////
 	ros::NodeHandle nh_;

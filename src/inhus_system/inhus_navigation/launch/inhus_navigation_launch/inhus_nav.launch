@@ -4,14 +4,14 @@
   <arg name="node_start_delay" default="2.0"/>
 
   <!-- localization and maps -->
-  <include file="$(find inhus_navigation)/launch/stage_launch/include/stage_locate_odom.launch"/> <!-- fake loc robot -->
-  <include file="$(find inhus_navigation)/launch/stage_launch/include/stage_locate.launch">
+  <!-- <include file="$(find inhus_navigation)/launch/inhus_navigation_launch/include/locate_odom.launch"/> -->
+  <include file="$(find inhus_navigation)/launch/inhus_navigation_launch/include/locate_pub.launch">
     <arg name="ns" value="$(arg ns)"/>
     <arg name="map_name" value="$(arg map_name)"/>
   </include>
 
   <!-- navigation -->
-  <include file="$(find inhus_navigation)/launch/stage_launch/include/stage_nav.launch">
+  <include file="$(find inhus_navigation)/launch/inhus_navigation_launch/include/nav.launch">
     <arg name="ns" value="$(arg ns)"/>
     <arg name="node_start_delay" value="$(arg node_start_delay)"/>
   </include>
@@ -21,9 +21,7 @@
     <arg name="ns" value="$(arg ns)"/>
   </include>
 
-  <!-- Interface with the simulator -->
-  <include file="$(find inhus_navigation)/launch/morse_launch/include/morse_interface.launch">
-    <arg name="ns" value="$(arg ns)"/>
-  </include>
+  <!-- visualization with Rviz -->
+  <include file="$(find inhus_navigation)/launch/rviz.launch"/>
 
 </launch>

@@ -4,8 +4,6 @@ Panels:
     Name: Displays
     Property Tree Widget:
       Expanded:
-        - /Global Options1
-        - /Status1
         - /TF1/Frames1
       Splitter Ratio: 0.3720930218696594
     Tree Height: 479
@@ -558,7 +556,7 @@ Visualization Manager:
       Marker Topic: /move_base/HATebLocalPlannerROS/agent_marker
       Name: HumanMarker
       Namespaces:
-        {}
+        body: true
       Queue Size: 100
       Value: true
     - Class: rviz/MarkerArray
@@ -566,7 +564,7 @@ Visualization Manager:
       Marker Topic: /move_base/HATebLocalPlannerROS/agent_arrow
       Name: HumanDirection
       Namespaces:
-        {}
+        direction: true
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
@@ -773,6 +771,10 @@ Visualization Manager:
           Value: false
         human1/base_footprint:
           Value: true
+        human1/base_laser_link:
+          Value: false
+        human1/base_link:
+          Value: false
         human1/odom:
           Value: false
         human2/base_footprint:
@@ -1144,7 +1146,7 @@ Visualization Manager:
       X std deviation: 0.5
       Y std deviation: 0.5
     - Class: rviz/SetGoal
-      Topic: /smb/move_base_simple/goal
+      Topic: /move_base_simple/goal
     - Class: rviz/PublishPoint
       Single click: true
       Topic: /clicked_point
@@ -1161,11 +1163,11 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Scale: 130.53781127929688
+      Scale: 59.74933624267578
       Target Frame: <Fixed Frame>
       Value: TopDownOrtho (rviz)
-      X: 1.267265796661377
-      Y: 8.364444732666016
+      X: 5.579792499542236
+      Y: 8.16619873046875
     Saved: ~
 Window Geometry:
   Displays:
@@ -1183,5 +1185,5 @@ Window Geometry:
   Views:
     collapsed: true
   Width: 1920
-  X: 0
+  X: 1920
   Y: 25

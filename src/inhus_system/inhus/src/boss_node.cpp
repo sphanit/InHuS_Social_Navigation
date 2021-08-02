@@ -198,24 +198,18 @@ void Boss::readGoalsFromXML()
 	TiXmlElement* l_goal = docHandle.FirstChild("goals").FirstChild("goal_list").FirstChild("goal").ToElement();
 	while(l_goal)
 	{
-		TiXmlElement *l_type = l_goal->FirstChildElement("type");
-
-		if(NULL != l_type)
-			area.goal.type = l_type->GetText();
+		if(NULL != l_goal->Attribute("type"))
+			area.goal.type = l_goal->Attribute("type");
 		if(area.goal.type == "navigation")
 		{
-			TiXmlElement *l_x = l_goal->FirstChildElement("x");
-			if(NULL != l_x)
-				area.goal.x = stof(l_x->GetText());
-			TiXmlElement *l_y = l_goal->FirstChildElement("y");
-			if(NULL != l_y)
-				area.goal.y = stof(l_y->GetText());
-			TiXmlElement *l_theta = l_goal->FirstChildElement("theta");
-			if(NULL != l_theta)
-				area.goal.theta = stof(l_theta->GetText());
-			TiXmlElement *l_radius = l_goal->FirstChildElement("radius");
-			if(NULL != l_radius)
-				area.radius = stof(l_radius->GetText());
+			if(NULL != l_goal->Attribute("x"))
+				area.goal.x = stof(l_goal->Attribute("x"));
+			if(NULL != l_goal->Attribute("y"))
+				area.goal.y = stof(l_goal->Attribute("y"));
+			if(NULL != l_goal->Attribute("theta"))
+				area.goal.theta = stof(l_goal->Attribute("theta"));
+			if(NULL != l_goal->Attribute("radius"))
+				area.radius = stof(l_goal->Attribute("radius"));
 		}
 		list_goals_.push_back(area);
 
@@ -226,37 +220,34 @@ void Boss::readGoalsFromXML()
 	TiXmlElement* l_scenario = docHandle.FirstChild("goals").FirstChild("scenarios").FirstChild().ToElement();
 	while(l_scenario)
 	{
-		vector<GoalArea> scenario;
+		Scenario scenario;
+
+		// Get Name
+		scenario.name = l_scenario->Value();
 
 		// Extract goals
 		TiXmlElement *l_goal = l_scenario->FirstChildElement();
 		while(l_goal)
 		{
-			TiXmlElement *l_type = l_goal->FirstChildElement("type");
-
-			if(NULL != l_type)
-				area.goal.type = l_type->GetText();
+			if(NULL != l_goal->Attribute("type"))
+				area.goal.type = l_goal->Attribute("type");
 			if(area.goal.type == "navigation")
 			{
-				TiXmlElement *l_x = l_goal->FirstChildElement("x");
-				if(NULL != l_x)
-					area.goal.x = stof(l_x->GetText());
-				TiXmlElement *l_y = l_goal->FirstChildElement("y");
-				if(NULL != l_y)
-					area.goal.y = stof(l_y->GetText());
-				TiXmlElement *l_theta = l_goal->FirstChildElement("theta");
-				if(NULL != l_theta)
-					area.goal.theta = stof(l_theta->GetText());
-				TiXmlElement *l_radius = l_goal->FirstChildElement("radius");
-				if(NULL != l_radius)
-					area.radius = stof(l_radius->GetText());
+				if(NULL != l_goal->Attribute("x"))
+					area.goal.x = stof(l_goal->Attribute("x"));
+				if(NULL != l_goal->Attribute("y"))
+					area.goal.y = stof(l_goal->Attribute("y"));
+				if(NULL != l_goal->Attribute("theta"))
+					area.goal.theta = stof(l_goal->Attribute("theta"));
+				if(NULL != l_goal->Attribute("radius"))
+					area.radius = stof(l_goal->Attribute("radius"));
 			}
-			scenario.push_back(area);
+			scenario.goals.push_back(area);
 
 			l_goal = l_goal->NextSiblingElement();
 		}
 
-		scenarios_goals_.push_back(scenario);
+		scenarios_.push_back(scenario);
 		l_scenario = l_scenario->NextSiblingElement();
 	}
 
@@ -270,24 +261,18 @@ void Boss::readGoalsFromXML()
 		TiXmlElement *l_goal = l_endless_scenario->FirstChildElement("goal");
 		while(l_goal)
 		{
-			TiXmlElement *l_type = l_goal->FirstChildElement("type");
-
-			if(NULL != l_type)
-				area.goal.type = l_type->GetText();
+			if(NULL != l_goal->Attribute("type"))
+				area.goal.type = l_goal->Attribute("type");
 			if(area.goal.type == "navigation")
 			{
-				TiXmlElement *l_x = l_goal->FirstChildElement("x");
-				if(NULL != l_x)
-					area.goal.x = stof(l_x->GetText());
-				TiXmlElement *l_y = l_goal->FirstChildElement("y");
-				if(NULL != l_y)
-					area.goal.y = stof(l_y->GetText());
-				TiXmlElement *l_theta = l_goal->FirstChildElement("theta");
-				if(NULL != l_theta)
-					area.goal.theta = stof(l_theta->GetText());
-				TiXmlElement *l_radius = l_goal->FirstChildElement("radius");
-				if(NULL != l_radius)
-					area.radius = stof(l_radius->GetText());
+				if(NULL != l_goal->Attribute("x"))
+					area.goal.x = stof(l_goal->Attribute("x"));
+				if(NULL != l_goal->Attribute("y"))
+					area.goal.y = stof(l_goal->Attribute("y"));
+				if(NULL != l_goal->Attribute("theta"))
+					area.goal.theta = stof(l_goal->Attribute("theta"));
+				if(NULL != l_goal->Attribute("radius"))
+					area.radius = stof(l_goal->Attribute("radius"));
 			}
 			endless_scenario.push_back(area);
 
@@ -308,11 +293,11 @@ void Boss::showGoals()
 
 	// scenarios
 	cout << "=> scenarios <=" << endl;
-	for(unsigned int i=0; i<scenarios_goals_.size(); i++)
+	for(unsigned int i=0; i<scenarios_.size(); i++)
 	{
-		cout << "scenario (" << i << ")" << endl;
-		for(unsigned int j=0; j<scenarios_goals_[i].size(); j++)
-			cout << "\t" << scenarios_goals_[i][j].goal.type << " " << scenarios_goals_[i][j].goal.x << " " << scenarios_goals_[i][j].goal.y << " " << scenarios_goals_[i][j].goal.theta << " " << scenarios_goals_[i][j].radius << endl;
+		cout << "scenario " << scenarios_[i].name << endl;
+		for(unsigned int j=0; j<scenarios_[i].goals.size(); j++)
+			cout << "\t" << scenarios_[i].goals[j].goal.type << " " << scenarios_[i].goals[j].goal.x << " " << scenarios_[i].goals[j].goal.y << " " << scenarios_[i].goals[j].goal.theta << " " << scenarios_[i].goals[j].radius << endl;
 	}
 
 	// endless
@@ -452,7 +437,7 @@ void Boss::askSendGoal()
 				// Ask goal coordinates
 				GoalArea goal;
 				goal.radius = 0;
-				goal.goal.type = "position";
+				goal.goal.type = "navigation";
 				while(ros::ok() && (cout 	<< "Goal x : ")
 				&& (!(cin >> goal.goal.x)))
 					cleanInput();
@@ -523,13 +508,9 @@ void Boss::askScenario()
 	cout << "Selected agents : " << agent_managers_[agent1]->getName() << " & " << agent_managers_[agent2]->getName() << endl;
 
 	// Ask which scenario
-	while(ros::ok() && (cout << endl	<< "1- Wide Area" << endl
-																		<< "2- Narrow Passage" << endl
-																		<< "3- Corridor" << endl
-																		<< "4- Narrow Corridor" << endl
-																		<< "0- Back" << endl
-																		<< "Which scenario ? ")
-	&& (!(cin >> choice_) || !(choice_>=0 && choice_<=scenarios_goals_.size())))
+	while(ros::ok() && this->showAskScenarios() && (cout 	<< "0- Back" << endl
+																												<< "Which scenario ? ")
+	&& (!(cin >> choice_) || !(choice_>=0 && choice_<=scenarios_.size())))
 		cleanInput();
 	cout << endl;
 	if(choice_==0){return;} // Back
@@ -566,18 +547,18 @@ void Boss::askScenario()
 	if(delay>=0)
 	{
 		cout << "Publish goal : " << agent_managers_[agent1]->getName() << endl;
-		agent_managers_[agent1]->publishGoal(scenarios_goals_[choice_scenario-1][agent1_goal]);
+		agent_managers_[agent1]->publishGoal(scenarios_[choice_scenario-1].goals[agent1_goal]);
 		wait(delay);
 		cout << "Publish goal : " << agent_managers_[agent2]->getName() << endl;
-		agent_managers_[agent2]->publishGoal(scenarios_goals_[choice_scenario-1][agent2_goal]);
+		agent_managers_[agent2]->publishGoal(scenarios_[choice_scenario-1].goals[agent2_goal]);
 	}
 	else
 	{
 		cout << "Publish goal : " << agent_managers_[agent2]->getName() << endl;
-		agent_managers_[agent2]->publishGoal(scenarios_goals_[choice_scenario-1][agent2_goal]);
+		agent_managers_[agent2]->publishGoal(scenarios_[choice_scenario-1].goals[agent2_goal]);
 		wait(-delay);
 		cout << "Publish goal : " << agent_managers_[agent1]->getName() << endl;
-		agent_managers_[agent1]->publishGoal(scenarios_goals_[choice_scenario-1][agent1_goal]);
+		agent_managers_[agent1]->publishGoal(scenarios_[choice_scenario-1].goals[agent1_goal]);
 	}
 }
 
@@ -637,6 +618,13 @@ void Boss::askSetAttitude()
 
 	// Set attitude
 	dynamic_cast<HumanManager*>(agent_managers_[choice_agent])->setAttitude(choice_-1);
+}
+
+bool Boss::showAskScenarios()
+{
+	for(unsigned int i=0; i<scenarios_.size(); i++)
+		cout << i+1 << "- " << scenarios_[i].name << endl;
+	return true;
 }
 
 void Boss::cleanInput()

@@ -53,10 +53,14 @@ ConflictManager::ConflictManager(ros::NodeHandle nh, bool* want_robot_placed)
 	server_init_conflict_ = 		nh_.advertiseService("init_check_conflict", &ConflictManager::srvInitCheckConflict, this);
 
 	// Service clients
-	client_cancel_goal_and_stop_ = 	nh_.serviceClient<inhus::Signal>("cancel_goal_and_stop");
+	ros::service::waitForService("cancel_goal_and_stop");
+	client_cancel_goal_and_stop_ = 	nh_.serviceClient<std_srvs::Empty>("cancel_goal_and_stop");
+	ros::service::waitForService("move_base/GlobalPlanner/make_plan");
 	client_make_plan_ =				nh_.serviceClient<nav_msgs::GetPlan>("move_base/GlobalPlanner/make_plan");
-	client_update_robot_map_ = nh_.serviceClient<inhus::Signal>("update_robot_map");
-	client_resume_supervisor_ = nh_.serviceClient<inhus::Signal>("resumeSupervisor");
+	ros::service::waitForService("update_robot_map");
+	client_update_robot_map_ = nh_.serviceClient<std_srvs::Empty>("update_robot_map");
+	ros::service::waitForService("resumeSupervisor");
+	client_resume_supervisor_ = nh_.serviceClient<std_srvs::Empty>("resumeSupervisor");
 }
 
 bool ConflictManager::srvCheckConflict(inhus::ActionBool::Request &req, inhus::ActionBool::Response &res)
@@ -146,7 +150,7 @@ bool ConflictManager::srvCheckConflict(inhus::ActionBool::Request &req, inhus::A
 	return true;
 }
 
-bool ConflictManager::srvInitCheckConflict(inhus::Signal::Request &req, inhus::Signal::Response &res)
+bool ConflictManager::srvInitCheckConflict(std_srvs::Empty::Request &req, std_srvs::Empty::Response &res)
 {
 	//ROS_INFO("Check conflict init");
 	current_path_.poses.clear();
@@ -481,11 +485,16 @@ HumanBehaviorModel::HumanBehaviorModel(ros::NodeHandle nh)
 	pub_log_ = 		nh_.advertise<std_msgs::String>("log", 100);
 
 	// Service clients
-	client_set_wait_goal_ = 		nh_.serviceClient<inhus::Signal>("set_wait_goal");
-	client_cancel_goal_and_stop_ = 	nh_.serviceClient<inhus::Signal>("cancel_goal_and_stop");
+	ros::service::waitForService("set_wait_goal");
+	client_set_wait_goal_ = 		nh_.serviceClient<std_srvs::Empty>("set_wait_goal");
+	ros::service::waitForService("cancel_goal_and_stop");
+	client_cancel_goal_and_stop_ = 	nh_.serviceClient<std_srvs::Empty>("cancel_goal_and_stop");
+	ros::service::waitForService("place_robot");
 	client_place_robot_ = 		nh_.serviceClient<inhus_navigation::PlaceRobot>("place_robot");
-	client_suspend_supervisor_ = nh_.serviceClient<inhus::Signal>("suspendSupervisor");
-	client_resume_supervisor_ = nh_.serviceClient<inhus::Signal>("resumeSupervisor");
+	ros::service::waitForService("suspendSupervisor");
+	client_suspend_supervisor_ = nh_.serviceClient<std_srvs::Empty>("suspendSupervisor");
+	ros::service::waitForService("resumeSupervisor");
+	client_resume_supervisor_ = nh_.serviceClient<std_srvs::Empty>("resumeSupervisor");
 
 	// Service server
 	server_place_robot_ = nh_.advertiseService("place_robot_hm", &HumanBehaviorModel::srvPlaceRobotHM, this);
@@ -537,7 +546,15 @@ HumanBehaviorModel::HumanBehaviorModel(ros::NodeHandle nh)
 	sub_harass_ = INIT;
 
 	// INIT GOALS
+	goal_file_name_ = "goals.xml";
+	std::string goal_file_path = ros::package::getPath("inhus") + "/config/" + goal_file_name_;
+	doc_ = new TiXmlDocument(goal_file_path);
+	if(!doc_->LoadFile())
+		ROS_ERROR("Failed to load %s", goal_file_path.c_str());
+	else
+		ROS_INFO("HBM: Goals file loaded");
 	this->readGoalsFromXML();
+	// this->showGoals();
 }
 
 void HumanBehaviorModel::readGoalsFromXML()
@@ -549,24 +566,18 @@ void HumanBehaviorModel::readGoalsFromXML()
 	TiXmlElement* l_goal = docHandle.FirstChild("goals").FirstChild("goal_list").FirstChild("goal").ToElement();
 	while(l_goal)
 	{
-		TiXmlElement *l_type = l_goal->FirstChildElement("type");
-
-		if(NULL != l_type)
-			area.goal.type = l_type->GetText();
+		if(NULL != l_goal->Attribute("type"))
+			area.goal.type = l_goal->Attribute("type");
 		if(area.goal.type == "navigation")
 		{
-			TiXmlElement *l_x = l_goal->FirstChildElement("x");
-			if(NULL != l_x)
-				area.goal.x = std::stof(l_x->GetText());
-			TiXmlElement *l_y = l_goal->FirstChildElement("y");
-			if(NULL != l_y)
-				area.goal.y = std::stof(l_y->GetText());
-			TiXmlElement *l_theta = l_goal->FirstChildElement("theta");
-			if(NULL != l_theta)
-				area.goal.theta = std::stof(l_theta->GetText());
-			TiXmlElement *l_radius = l_goal->FirstChildElement("radius");
-			if(NULL != l_radius)
-				area.radius = std::stof(l_radius->GetText());
+			if(NULL != l_goal->Attribute("x"))
+				area.goal.x = std::stof(l_goal->Attribute("x"));
+			if(NULL != l_goal->Attribute("y"))
+				area.goal.y = std::stof(l_goal->Attribute("y"));
+			if(NULL != l_goal->Attribute("theta"))
+				area.goal.theta = std::stof(l_goal->Attribute("theta"));
+			if(NULL != l_goal->Attribute("radius"))
+				area.radius = std::stof(l_goal->Attribute("radius"));
 		}
 		known_goals_.push_back(area);
 
@@ -574,10 +585,19 @@ void HumanBehaviorModel::readGoalsFromXML()
 	}
 }
 
-void HumanBehaviorModel::publishGoal(inhus::Goal& goal)
+void HumanBehaviorModel::showGoals()
 {
+	// list goals
+	std::cout << "=> list_goals <=" << std::endl;
+	for(unsigned int i=0; i<known_goals_.size(); i++)
+		std::cout << "\t" << known_goals_[i].goal.type << " " << known_goals_[i].goal.x << " " << known_goals_[i].goal.y << " " << known_goals_[i].goal.theta << " " << known_goals_[i].radius << std::endl;
+}
+
+void HumanBehaviorModel::publishGoal(GoalArea goal)
+{
+	goal = computeGoalWithRadius(goal);
 	executing_plan_ = true;
-	pub_new_goal_.publish(goal);
+	pub_new_goal_.publish(goal.goal);
 }
 
 void HumanBehaviorModel::processSimData()
@@ -904,9 +924,9 @@ void HumanBehaviorModel::testSeeRobot()
 
 ////////////////////// Attitudes //////////////////////////
 
-inhus::Goal HumanBehaviorModel::chooseGoal(bool random)
+GoalArea HumanBehaviorModel::chooseGoal(bool random)
 {
-	inhus::Goal goal;
+	GoalArea goal;
 	static int index_list=-1;
 	int i=0;
 
@@ -914,7 +934,7 @@ inhus::Goal HumanBehaviorModel::chooseGoal(bool random)
 	{
 		do
 		{
-			i=rand()%known_goals_.size() +1 ;
+			i=rand()%known_goals_.size();
 		}while(known_goals_[i].goal.x==previous_goal_.x && known_goals_[i].goal.y==previous_goal_.y);
 	}
 	// follow list of known goals
@@ -925,9 +945,9 @@ inhus::Goal HumanBehaviorModel::chooseGoal(bool random)
 	}
 
 	// if it's an area, pick a goal in it
-	goal = computeGoalWithRadius(known_goals_[i]).goal;
+	goal = computeGoalWithRadius(known_goals_[i]);
 
-	current_goal_=goal;
+	current_goal_=goal.goal;
 
 	return goal;
 }
@@ -936,7 +956,7 @@ void HumanBehaviorModel::attNonStop()
 {
 	if(!executing_plan_)
 	{
-		inhus::Goal goal = chooseGoal(true);
+		GoalArea goal = chooseGoal(true);
 
 		this->publishGoal(goal);
 	}
@@ -952,8 +972,8 @@ void HumanBehaviorModel::attRandom()
 		{
 			//ROS_INFO("DECIDE NEW GOAL ! ");
 			inhus::Goal previous_goal = current_goal_;
-			inhus::Goal new_goal = this->chooseGoal(true);
-			if(new_goal.x != previous_goal.x || new_goal.y != previous_goal.y)
+			GoalArea new_goal = this->chooseGoal(true);
+			if(new_goal.goal.x != previous_goal.x || new_goal.goal.y != previous_goal.y)
 				this->publishGoal(new_goal);
 		}
 		last_time_=ros::Time::now();
@@ -1153,7 +1173,7 @@ void HumanBehaviorModel::conflictManagerLoop()
 
 /////////////////// Service servers ///////////////////////
 
-bool HumanBehaviorModel::srvUpdateRobotMap(inhus::Signal::Request& req, inhus::Signal::Response& res)
+bool HumanBehaviorModel::srvUpdateRobotMap(std_srvs::Empty::Request& req, std_srvs::Empty::Response& res)
 {
 	this->updateRobotOnMap();
 	return true;
@@ -1236,7 +1256,10 @@ void HumanBehaviorModel::newGoalCallback(const inhus::Goal::ConstPtr& goal)
 	previous_goal_ = 	current_goal_;
 	current_goal_ = 	*goal;
 
-	this->publishGoal(current_goal_);
+	GoalArea goal_area;
+	goal_area.goal = *goal;
+	goal_area.radius = 0.0;
+	this->publishGoal(goal_area);
 }
 
 void HumanBehaviorModel::setAttitudeCallback(const std_msgs::Int32::ConstPtr& msg)
@@ -1331,13 +1354,13 @@ int main(int argc, char** argv)
 
 	ros::Rate rate(30);
 
-	//ROS_INFO("Waiting for init ...");
+	ROS_INFO("HBM: Waiting for init ... (navigation and localization)");
 	while(ros::ok() && !human_model.initDone())
 	{
 		ros::spinOnce();
 		rate.sleep();
 	}
-	//ROS_INFO("LETS_GO");
+	ROS_INFO("HBM: Ready");
 
 	while(ros::ok())
 	{

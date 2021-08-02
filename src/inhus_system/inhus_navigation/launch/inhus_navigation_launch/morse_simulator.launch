@@ -2,7 +2,9 @@
   <arg name="ns" default="human1"/>
 
   <include file="$(find morse_ros)/launch/morse_pr2.launch"/>
-  <include file="$(find inhus_navigation)/launch/morse_launch/include/morse_interface.launch">
+
+  <!-- Interface with the simulator -->
+  <include file="$(find inhus_navigation)/launch/inhus_navigation_launch/include/morse_interface.launch">
     <arg name="ns" value="$(arg ns)"/>
   </include>
 
