@@ -50,7 +50,7 @@ LogManagerCohan::LogManagerCohan()
 
 	id_ = 0;
 
-  sub_odom_r_ = nh_.subscribe("/robot_odom", 100, &LogManagerCohan::odomRCB, this);
+	sub_odom_r_ = nh_.subscribe("/robot_odom", 100, &LogManagerCohan::odomRCB, this);
 	sub_odom_h_ = nh_.subscribe("/human_odom", 100, &LogManagerCohan::odomHCB, this);
 	sub_robot_goal_ = nh_.subscribe("/robot_goal", 100, &LogManagerCohan::robotGoalCB, this);
 	sub_robot_goal_status_ = nh_.subscribe("/robot_goal_status", 100, &LogManagerCohan::robotGoalStatusCB, this);
@@ -80,15 +80,15 @@ void LogManagerCohan::costmapCB(const nav_msgs::OccupancyGrid::ConstPtr& msg){
 	if(goal_received_ && !goal_done_){
 		log_file_r_ << "pose: " << odom_r_.pose.pose.position.x << ", " << odom_r_.pose.pose.position.y << ", " << odom_r_.pose.pose.orientation.z << ", " << odom_r_.pose.pose.orientation.w << ", vel: " << odom_r_.twist.twist.linear.x << ", " << odom_r_.twist.twist.linear.y << ", " << odom_r_.twist.twist.angular.z << endl;
 		log_file_h_ << "pose: " << odom_h_.pose.pose.position.x << ", " << odom_h_.pose.pose.position.y << ", " << odom_h_.pose.pose.orientation.z << ", " << odom_h_.pose.pose.orientation.w << ", vel: " << odom_h_.twist.twist.linear.x << ", " << odom_h_.twist.twist.linear.y << ", " << odom_h_.twist.twist.angular.z << endl;
-    auto map_data = msg->data;
-    int cmap[150][150];
-    for(int i = 0; i < map_data.size(); ++i) {
-      cmap[i / 150][i % 150] = (int) map_data[i];
-    }
-    string cmap_name = path_ + "/logs/log_data/cohan_logs/lcmap" + std::to_string(map_id_);
-    save_image(cmap_name,cmap);
-    map_id_++;
-  }
+		auto map_data = msg->data;
+		int cmap[150][150];
+		for(int i = 0; i < map_data.size(); ++i) {
+			cmap[i / 150][i % 150] = (int) map_data[i];
+		}
+		string cmap_name = path_ + "/logs/cohan_logs/map_data/lcmap_" + std::to_string(id_)+ "_"+ std::to_string(map_id_);
+		save_image(cmap_name,cmap);
+		map_id_++;
+	}
 }
 
 
