@@ -83,7 +83,7 @@ void LogManagerCohan::costmapCB(const nav_msgs::OccupancyGrid::ConstPtr& msg){
 		auto map_data = msg->data;
 		int cmap[150][150];
 		for(int i = 0; i < map_data.size(); ++i) {
-			cmap[i / 150][i % 150] = (int) map_data[i];
+			cmap[i % 150][i / 150] = (int) map_data[i];
 		}
 		string cmap_name = path_ + "/logs/cohan_logs/map_data/lcmap_" + std::to_string(id_)+ "_"+ std::to_string(map_id_);
 		save_image(cmap_name,cmap);

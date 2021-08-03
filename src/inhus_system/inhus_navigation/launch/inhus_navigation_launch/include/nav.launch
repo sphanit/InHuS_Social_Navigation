@@ -11,7 +11,7 @@
   <!-- move base node with a starting delay if needed -->
 	<node pkg="move_base" type="move_base" name="move_base" ns="$(arg ns)" output="screen" launch-prefix="bash -c 'sleep $(arg node_start_delay); $0 $@' ">
 
-		<remap from="cmd_vel" to="cmd_geo"/>
+		<!--remap from="cmd_vel" to="cmd_geo"/-->
 		<remap from="/map" to="map_static"/>
 
 		<param name="base_global_planner" value="$(arg global_planner)"/>
