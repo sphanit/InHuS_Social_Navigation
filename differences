@@ -1,0 +1,245 @@
+diff --git a/src/inhus_system/inhus/launch/boss.launch b/src/inhus_system/inhus/launch/boss.launch
+index 8367005..91f1936 100644
+--- a/src/inhus_system/inhus/launch/boss.launch
++++ b/src/inhus_system/inhus/launch/boss.launch
+@@ -1,6 +1,6 @@
+ <launch>
+ 	<arg name="ns_human" default="human1"/>
+-	<arg name="ns_robot" default=""/>
++	<arg name="ns_robot" default="smb"/>
+ 	<!-- ns_robot = "" or "smb" -->
+ 	<arg name="map_name" default="laas_adream"/>
+ 
+@@ -10,7 +10,7 @@
+ 
+ 		<remap from="/robot/move_base_goal_status" to="/$(arg ns_robot)/move_base/status"/>
+ 		<remap from="/robot/move_base_goal" to="/$(arg ns_robot)/move_base_simple/goal"/>
+-
++		<remap to="/robot/cmd_vel" from="/$(arg ns_robot)/cmd_vel"/>
+ 		<param name="map_name" value="$(arg map_name)"/>
+ 	</node>
+ 
+diff --git a/src/inhus_system/inhus_navigation/launch/cohan_nav/_inhus_cohan_nav.launch b/src/inhus_system/inhus_navigation/launch/cohan_nav/_inhus_cohan_nav.launch
+index ac01bf7..f3e9aa6 100644
+--- a/src/inhus_system/inhus_navigation/launch/cohan_nav/_inhus_cohan_nav.launch
++++ b/src/inhus_system/inhus_navigation/launch/cohan_nav/_inhus_cohan_nav.launch
+@@ -21,7 +21,7 @@
+   </include>
+ 
+   <!-- visualization with Rviz -->
+-  <!-- <include file="$(find inhus_navigation)/launch/other_launch/_rviz.launch"/> -->
++  <include file="$(find inhus_navigation)/launch/other_launch/_rviz.launch"/>
+ 
+   <!-- MAP SERVERS -->
+   <!-- static map server -->
+diff --git a/src/inhus_system/inhus_navigation/maps/laas_adream/goals.xml b/src/inhus_system/inhus_navigation/maps/laas_adream/goals.xml
+index 50a22cd..77b6b3f 100644
+--- a/src/inhus_system/inhus_navigation/maps/laas_adream/goals.xml
++++ b/src/inhus_system/inhus_navigation/maps/laas_adream/goals.xml
+@@ -23,6 +23,8 @@
+     <pose_goal type="pose_goal" x="10.6" y="15.8"  theta="0.0"   radius="0.0"/>
+     <pose_goal type="pose_goal" x="1.0"  y="15.8"  theta="-3.14" radius="0.0"/>
+     <pose_goal type="pose_goal" x="0.65" y="8.50"  theta="-3.14" radius="0.0"/>
++    <pose_goal type="pose_goal" x="6.45" y="13.2"  theta="0.0" radius="0.0"/>
++    <pose_goal type="pose_goal" x="8.9" y="10.0"  theta="-1.57" radius="0.0"/>
+   </pose_goals>
+ 
+   <named_goals>
+diff --git a/src/inhus_system/inhus_navigation/maps/mall/goals.xml b/src/inhus_system/inhus_navigation/maps/mall/goals.xml
+index 239bd52..92179ca 100644
+--- a/src/inhus_system/inhus_navigation/maps/mall/goals.xml
++++ b/src/inhus_system/inhus_navigation/maps/mall/goals.xml
+@@ -13,10 +13,12 @@
+ <goals>
+ 
+   <pose_goals>
+-    <pose_goal type="pose_goal" x="24"  y="16.6"   theta="0.0" radius="0.0"/>
++    <pose_goal type="pose_goal" x="27"  y="16.6"   theta="0.0" radius="0.0"/>
+     <pose_goal type="pose_goal" x="32.6"  y="16.6"   theta="0.0" radius="0.0"/>
+     <pose_goal type="pose_goal" x="10.7"  y="16.6"   theta="0.0" radius="0.0"/>
+     <pose_goal type="pose_goal" x="25.1"  y="26"   theta="0.0" radius="0.0"/>
++    <pose_goal type="pose_goal" x="6.0"  y="39.0"   theta="0.0" radius="0.0"/>
++    <pose_goal type="pose_goal" x="11.3"  y="36.3"   theta="-1.57" radius="0.0"/>
+   </pose_goals>
+ 
+   <named_goals>
+@@ -25,16 +27,23 @@
+   <scenarios>
+ 
+     <appearance>
+-      <init_h type="pose_goal" x="25.1" y="21.8" theta="-1.57" radius="0.0"/>
++      <init_h type="pose_goal" x="25.8" y="21.8" theta="-1.57" radius="0.0"/>
+       <goal_h type="pose_goal" x="30.5" y="16.6" theta="0.0" radius="0.0"/>
+-      <init_r type="pose_goal" x="31.0" y="16.6" theta="-3.14" radius="0.0"/>
++      <init_r type="pose_goal" x="30.0" y="16.6" theta="-3.14" radius="0.0"/>
+       <goal_r type="pose_goal" x="25.1" y="26" theta="1.57" radius="0.0"/>
+     </appearance>
+ 
++    <appearance_2>
++      <init_h type="pose_goal" x="21.5" y="36.5" theta="-3.14" radius="0.0"/>
++      <goal_h type="pose_goal" x="20.0" y="41.0" theta="-1.57" radius="0.0"/>
++      <init_r type="pose_goal" x="22.0" y="39.0" theta="-3.14" radius="0.0"/>
++      <goal_r type="pose_goal" x="16.0" y="39.0" theta="-3.14" radius="0.0"/>
++    </appearance_2>
++
+     <corridor>
+-      <init_h type="pose_goal" x="15" y="16.6" theta="0.0" radius="0.0"/>
++      <init_h type="pose_goal" x="10" y="16.6" theta="0.0" radius="0.0"/>
+       <goal_h type="pose_goal" x="32.6" y="16.6" theta="0.0" radius="0.0"/>
+-      <init_r type="pose_goal" x="30.5" y="16.6" theta="-3.14" radius="0.0"/>
++      <init_r type="pose_goal" x="31.0" y="16.6" theta="-3.14" radius="0.0"/>
+       <goal_r type="pose_goal" x="10.7" y="16.6" theta="-3.14" radius="0.0"/>
+     </corridor>
+ 
+diff --git a/src/inhus_system/inhus_navigation/rviz/inhus.rviz b/src/inhus_system/inhus_navigation/rviz/inhus.rviz
+index 0abe8f9..666c3aa 100644
+--- a/src/inhus_system/inhus_navigation/rviz/inhus.rviz
++++ b/src/inhus_system/inhus_navigation/rviz/inhus.rviz
+@@ -3,9 +3,10 @@ Panels:
+     Help Height: 78
+     Name: Displays
+     Property Tree Widget:
+-      Expanded: ~
++      Expanded:
++        - /LaserScan1
+       Splitter Ratio: 0.779187798500061
+-    Tree Height: 475
++    Tree Height: 463
+   - Class: rviz/Selection
+     Name: Selection
+   - Class: rviz/Tool Properties
+@@ -198,7 +199,7 @@ Visualization Manager:
+       Marker Topic: /human1/visualization_marker
+       Name: InHuS goal
+       Namespaces:
+-        "": true
++        {}
+       Queue Size: 100
+       Value: true
+     - Class: rviz/Marker
+@@ -229,7 +230,7 @@ Visualization Manager:
+       Buffer Length: 1
+       Class: rviz/Path
+       Color: 85; 0; 0
+-      Enabled: false
++      Enabled: true
+       Head Diameter: 0.30000001192092896
+       Head Length: 0.20000000298023224
+       Length: 0.30000001192092896
+@@ -247,12 +248,12 @@ Visualization Manager:
+       Shaft Length: 0.10000000149011612
+       Topic: /smb/move_base/GlobalPlanner/plan
+       Unreliable: false
+-      Value: false
++      Value: true
+     - Alpha: 1
+       Buffer Length: 1
+       Class: rviz/Path
+       Color: 117; 80; 123
+-      Enabled: false
++      Enabled: true
+       Head Diameter: 0.30000001192092896
+       Head Length: 0.20000000298023224
+       Length: 0.30000001192092896
+@@ -270,7 +271,7 @@ Visualization Manager:
+       Shaft Length: 0.10000000149011612
+       Topic: /smb/move_base/TebLocalPlannerROS/local_plan
+       Unreliable: false
+-      Value: false
++      Value: true
+     - Alpha: 0.699999988079071
+       Class: rviz/Map
+       Color Scheme: map
+@@ -281,6 +282,34 @@ Visualization Manager:
+       Unreliable: false
+       Use Timestamp: false
+       Value: false
++    - Alpha: 1
++      Autocompute Intensity Bounds: true
++      Autocompute Value Bounds:
++        Max Value: 10
++        Min Value: -10
++        Value: true
++      Axis: Z
++      Channel Name: intensity
++      Class: rviz/LaserScan
++      Color: 255; 255; 255
++      Color Transformer: Intensity
++      Decay Time: 0
++      Enabled: true
++      Invert Rainbow: false
++      Max Color: 255; 255; 255
++      Min Color: 0; 0; 0
++      Name: LaserScan
++      Position Transformer: XYZ
++      Queue Size: 10
++      Selectable: true
++      Size (Pixels): 3
++      Size (m): 0.009999999776482582
++      Style: Flat Squares
++      Topic: /scan
++      Unreliable: false
++      Use Fixed Frame: true
++      Use rainbow: true
++      Value: true
+   Enabled: true
+   Global Options:
+     Background Color: 48; 48; 48
+@@ -301,14 +330,14 @@ Visualization Manager:
+       X std deviation: 0.5
+       Y std deviation: 0.5
+     - Class: rviz/SetGoal
+-      Topic: /move_base_simple/goal
++      Topic: /smb/move_base_simple/goal
+     - Class: rviz/PublishPoint
+       Single click: true
+       Topic: /clicked_point
+   Value: true
+   Views:
+     Current:
+-      Angle: 0
++      Angle: 1.5749948024749756
+       Class: rviz/TopDownOrtho
+       Enable Stereo Rendering:
+         Stereo Eye Separation: 0.05999999865889549
+@@ -318,19 +347,19 @@ Visualization Manager:
+       Invert Z Axis: false
+       Name: Current View
+       Near Clip Distance: 0.009999999776482582
+-      Scale: 60.25770568847656
++      Scale: 50.63150405883789
+       Target Frame: <Fixed Frame>
+       Value: TopDownOrtho (rviz)
+-      X: 9.628571510314941
+-      Y: 7.057828903198242
++      X: 27.946035385131836
++      Y: 17.515371322631836
+     Saved: ~
+ Window Geometry:
+   Displays:
+     collapsed: true
+-  Height: 1031
++  Height: 1025
+   Hide Left Dock: true
+   Hide Right Dock: true
+-  QMainWindow State: 000000ff00000000fd000000040000000000000156000003b1fc0200000008fb0000001200530065006c0065006300740069006f006e00000001e10000009b0000005c00fffffffb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c006100790073000000003b00000264000000c700fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007300000002a5000001470000005c00fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c000002610000000100000111000003b1fc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a00560069006500770073000000003b000003b1000000a000fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e100000197000000030000077d0000003efc0100000002fb0000000800540069006d006500000000000000077d0000042700fffffffb0000000800540069006d0065010000000000000450000000000000000000000780000003b100000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
++  QMainWindow State: 000000ff00000000fd000000040000000000000156000003a7fc0200000008fb0000001200530065006c0065006300740069006f006e00000001e10000009b0000005c00fffffffb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c006100790073000000003d0000025a000000c900fffffffb0000001e0054006f006f006c002000500072006f0070006500720074006900650073000000029d000001470000005c00fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c000002610000000100000111000003b1fc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a00560069006500770073000000003b000003b1000000a400fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e100000197000000030000077d0000003efc0100000002fb0000000800540069006d006500000000000000077d000004f300fffffffb0000000800540069006d006501000000000000045000000000000000000000073d000003a700000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+   Selection:
+     collapsed: false
+   Time:
+@@ -339,6 +368,6 @@ Window Geometry:
+     collapsed: true
+   Views:
+     collapsed: true
+-  Width: 1920
+-  X: 1920
+-  Y: 25
++  Width: 1853
++  X: 67
++  Y: 147
+diff --git a/src/smb b/src/smb
+--- a/src/smb
++++ b/src/smb
+@@ -1 +1 @@
+-Subproject commit b42cf1fa903cb8fb34eaf5b23aa2821efc62a202
++Subproject commit b42cf1fa903cb8fb34eaf5b23aa2821efc62a202-dirty

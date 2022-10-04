@@ -70,6 +70,41 @@ seen_ratio_data = []
 seen_ratio_time = []
 seen_ratio_source = ColumnDataSource()
 
+
+########## New Proposed Metrics ############
+
+# C_REACT
+# C_DANGER
+# C_PASSBY
+# C_VISIBILITY
+# C_SURPRISE
+
+c_danger_data = []
+c_danger_time = []
+c_danger_source = ColumnDataSource()
+
+c_passby_data = []
+c_passby_time = []
+c_passby_source = ColumnDataSource()
+
+c_visible_data = []
+c_visible_time = []
+c_visible_source = ColumnDataSource()
+
+c_surprise_data = []
+c_surprise_time = []
+c_surprise_source = ColumnDataSource()
+
+c_react_data = []
+c_react_time = []
+c_react_source = ColumnDataSource()
+
+cost_danger_max = -10
+cost_passby_max = -10
+cost_visible_max = -10
+cost_surprise_max = -10
+cost_react_max = -10
+
 min_x_default = 0
 max_x_default = 0
 max_vel = 0
@@ -123,7 +158,8 @@ def updateInputValue(t_min=None, t_max=None):
     t_max_input.value = "{:.1f}".format(t_max_new)
 
 def updateFigureRange(min_x=None, max_x=None):
-    global p1, p2, p3, p4
+    global p1, p2, p3, p4, init_text_metrics_pretext, metrics_pretext
+    global cost_danger_max, cost_passby_max, cost_visible_max, cost_surprise_max, cost_react_max
 
     if min_x==None and max_x==None:
         min_x = min_x_default
@@ -136,7 +172,7 @@ def updateFigureRange(min_x=None, max_x=None):
         p3.x_range.start=min_x
         p3.x_range.end=max_x
         p4.x_range.start=min_x
-        p4.x_range.end=max_x
+        p4.x_range.end=max_x      
     elif max_x==None:
         p1.x_range.start=min_x
         p2.x_range.start=min_x
@@ -146,7 +182,7 @@ def updateFigureRange(min_x=None, max_x=None):
         p1.x_range.end=max_x
         p2.x_range.end=max_x
         p3.x_range.end=max_x
-        p4.x_range.end=max_x
+        p4.x_range.end=max_x   
     else:
         p1.x_range.start=min_x
         p1.x_range.end=max_x
@@ -156,6 +192,54 @@ def updateFigureRange(min_x=None, max_x=None):
         p3.x_range.end=max_x
         p4.x_range.start=min_x
         p4.x_range.end=max_x
+        
+    updateMetrics(min_x, max_x)  
+    text_metrics = "Danger: {:.2f}\n".format(cost_danger_max)\
+                + "Passby: {:.2f}\n".format(cost_passby_max)\
+                + "Visible: {:.2f}\n".format(cost_visible_max)\
+                + "Surprise: {:.2f}\n".format(cost_surprise_max)\
+                + "React: {:.2f}\n".format(cost_react_max)\
+                + "[{:.2f}, {:.2f}, {:.2f}, {:.2f}, {:.2f}]".format(cost_danger_max,cost_passby_max, cost_visible_max, cost_surprise_max, cost_react_max)
+
+    metrics_pretext.text=init_text_metrics_pretext + text_metrics
+
+def updateMetrics(min_x, max_x):
+    global cost_danger_max, cost_passby_max, cost_visible_max, cost_surprise_max, cost_react_max
+
+    idx_min = c_danger_time.index(min(c_danger_time, key=lambda x:abs(x-min_x)))
+    idx_max = c_danger_time.index(min(c_danger_time, key=lambda x:abs(x-max_x)))
+    if(idx_min!=idx_max):
+        cost_danger_max = max(c_danger_data[idx_min:idx_max])
+    else:
+        cost_danger_max = -10
+
+    idx_min = c_passby_time.index(min(c_passby_time, key=lambda x:abs(x-min_x)))
+    idx_max = c_passby_time.index(min(c_passby_time, key=lambda x:abs(x-max_x)))
+    if(idx_min!=idx_max):
+        cost_passby_max = max(c_passby_data[idx_min:idx_max])
+    else:
+        cost_passby_max = -10
+
+    idx_min = c_visible_time.index(min(c_visible_time, key=lambda x:abs(x-min_x)))
+    idx_max = c_visible_time.index(min(c_visible_time, key=lambda x:abs(x-max_x)))
+    if(idx_min!=idx_max):
+        cost_visible_max = max(c_visible_data[idx_min:idx_max])
+    else:
+        cost_visible_max = -10
+
+    idx_min = c_surprise_time.index(min(c_surprise_time, key=lambda x:abs(x-min_x)))
+    idx_max = c_surprise_time.index(min(c_surprise_time, key=lambda x:abs(x-max_x)))
+    if(idx_min!=idx_max):
+        cost_surprise_max = max(c_surprise_data[idx_min:idx_max])
+    else:
+        cost_surprise_max = -10
+
+    idx_min = c_react_time.index(min(c_react_time, key=lambda x:abs(x-min_x)))
+    idx_max = c_react_time.index(min(c_react_time, key=lambda x:abs(x-max_x)))
+    if(idx_min!=idx_max):
+        cost_react_max = max(c_react_data[idx_min:idx_max])  
+    else:
+        cost_react_max = -10
 
 def updateMapper():
     global mapper
@@ -290,6 +374,27 @@ def readDataFromFile(filename):
                 elif mylist[3] == 'SURPRISED':
                     surprise_data.append(0)
                     surprise_time.append(float(mylist[4]))
+
+                ## New proposed metrics
+                elif mylist[3] == 'C_DANGER':
+                    c_danger_data.append(float(mylist[4]))
+                    c_danger_time.append(float(mylist[5]))
+
+                elif mylist[3] == 'C_PASSBY':
+                    c_passby_data.append(float(mylist[4]))
+                    c_passby_time.append(float(mylist[5]))
+
+                elif mylist[3] == 'C_VISIBILITY':
+                    c_visible_data.append(float(mylist[4]))
+                    c_visible_time.append(float(mylist[5]))
+
+                elif mylist[3] == 'C_SURPRISE':
+                    c_surprise_data.append(float(mylist[4]))
+                    c_surprise_time.append(float(mylist[5]))
+
+                elif mylist[3] == 'C_REACT':
+                    c_react_data.append(float(mylist[4]))
+                    c_react_time.append(float(mylist[5]))   
     f.close()
 
 def treatData():
@@ -338,6 +443,13 @@ def updateColumnDataSource():
     rel_spd_source.data = dict(x=rel_spd_time, y=rel_spd_data)
     surprise_source.data = dict(x=surprise_time, y=surprise_data)
     seen_ratio_source.data = dict(x=seen_ratio_time, y=seen_ratio_data)
+    
+    ## New proposed metrics
+    c_danger_source.data = dict(x=c_danger_time, y=c_danger_data)
+    c_passby_source.data = dict(x=c_passby_time, y=c_passby_data)
+    c_visible_source.data = dict(x=c_visible_time, y=c_visible_data)
+    c_surprise_source.data = dict(x=c_surprise_time, y=c_surprise_data)
+    c_react_source.data = dict(x=c_react_time, y=c_react_data)
 
 ######################################################################################################
 ######################################################################################################
@@ -359,17 +471,61 @@ TOOLTIPS = [("(x,y)", "($x, $y)")]
 ## FIGURES ##
 #############
 
+###############################################Original ###########################################
+# p1 = figure(x_range=(min_x_default, max_x_default), tools=common_tools, active_scroll="wheel_zoom", frame_width=width, height=height, output_backend="webgl")
+# p1.toolbar.logo = None
+# p1.toolbar.autohide = False
+# p1.toolbar_location = 'left'
+# p1.add_tools(HoverTool(tooltips=TOOLTIPS))
+# p1.yaxis.axis_label = "Path length (m)"
+# path = p1.cross('x', 'y', source=path_source, size=8, line_width=2, muted_alpha=muted_alpha, legend_label="path length")
+# first = p1.circle('x', 'y', source=first_source, size=8, color='red', muted_alpha=muted_alpha, legend_label="first path length")
+# state_exec = p1.square('x', 'y', source=state_exec_source, size=8, color='green', muted_alpha=muted_alpha, legend_label="EXEC state")
+# state_approach = p1.square('x', 'y', source=state_approach_source, size=8, color='orange', muted_alpha=muted_alpha, legend_label="APPROACH state")
+# state_blocked = p1.square('x', 'y', source=state_blocked_source, size=8, color='red', muted_alpha=muted_alpha, legend_label="BLOCKED state")
+# p1.legend.visible=False
+# p1.legend.margin = margin
+# p1.legend.click_policy=default_click_policy
+
+p4 = figure(x_range=(min_x_default, max_x_default), tools=common_tools, active_scroll="wheel_zoom", frame_width=width, height=height, output_backend="webgl")
+p4.toolbar.logo = None
+p4.toolbar.autohide = False
+p4.toolbar_location = 'left'
+p4.add_tools(HoverTool(tooltips=TOOLTIPS))
+p4.yaxis.axis_label = "H-R Distance (m)"
+p4.extra_y_ranges = {"foo": Range1d(start=0, end=max_vel)}
+p4.add_layout(LinearAxis(y_range_name="foo", axis_label="Speeds (m/s)"), 'right')
+dist = p4.line('x', 'y', source=dist_source, line_width=3, color='gray', muted_alpha=muted_alpha, line_dash="dashed", legend_label="distance", )
+vel_h = p4.line('x', 'y', source=vel_h_source, line_width=3, color='blue', muted_alpha=muted_alpha, y_range_name="foo", legend_label="speed h")
+vel_r = p4.line('x', 'y', source=vel_r_source, line_width=3, color='red', muted_alpha=muted_alpha, y_range_name="foo", legend_label="speed r")
+p4.legend.visible=False
+p4.legend.margin = margin
+p4.legend.click_policy=default_click_policy
+
+# p3 = figure(x_range=(min_x_default, max_x_default), tools=common_tools, active_scroll="wheel_zoom", frame_width=width, height=height, output_backend="webgl")
+# p3.toolbar.logo = None
+# p3.toolbar.autohide = False
+# p3.toolbar_location = 'left'
+# p3.add_tools(HoverTool(tooltips=TOOLTIPS))
+# p3.yaxis.axis_label = "TTC (s)"
+# p3.y_range = Range1d(0,10);
+# p3.extra_y_ranges = {"foo2" : Range1d(start=0, end=max_rel_vel)}
+# p3.add_layout(LinearAxis(y_range_name="foo2", axis_label="Relative speed (m/s)"), 'right')
+# ttc = p3.cross('x', 'y', source=ttc_source, size=8, color='black', muted_alpha=muted_alpha, legend_label="TTC")
+# rel_spd = p3.line('x', 'y', source=rel_spd_source, line_width=3, color='orange', muted_alpha=muted_alpha, y_range_name="foo2", legend_label="rel speed")
+# p3.legend.visible=False
+# p3.legend.margin = margin
+# p3.legend.click_policy=default_click_policy
+######################################################################
+
+
 p1 = figure(x_range=(min_x_default, max_x_default), tools=common_tools, active_scroll="wheel_zoom", frame_width=width, height=height, output_backend="webgl")
 p1.toolbar.logo = None
 p1.toolbar.autohide = False
 p1.toolbar_location = 'left'
 p1.add_tools(HoverTool(tooltips=TOOLTIPS))
-p1.yaxis.axis_label = "Path length (m)"
-path = p1.cross('x', 'y', source=path_source, size=8, line_width=2, muted_alpha=muted_alpha, legend_label="path length")
-first = p1.circle('x', 'y', source=first_source, size=8, color='red', muted_alpha=muted_alpha, legend_label="first path length")
-state_exec = p1.square('x', 'y', source=state_exec_source, size=8, color='green', muted_alpha=muted_alpha, legend_label="EXEC state")
-state_approach = p1.square('x', 'y', source=state_approach_source, size=8, color='orange', muted_alpha=muted_alpha, legend_label="APPROACH state")
-state_blocked = p1.square('x', 'y', source=state_blocked_source, size=8, color='red', muted_alpha=muted_alpha, legend_label="BLOCKED state")
+p1.yaxis.axis_label = "cost_visibility"
+c_vis = p1.line('x', 'y', source=c_visible_source, line_width=3, color='blue', muted_alpha=muted_alpha, legend_label="c_visible")
 p1.legend.visible=False
 p1.legend.margin = margin
 p1.legend.click_policy=default_click_policy
@@ -379,12 +535,9 @@ p2.toolbar.logo = None
 p2.toolbar.autohide = False
 p2.toolbar_location = 'left'
 p2.add_tools(HoverTool(tooltips=TOOLTIPS))
-p2.yaxis.axis_label = "H-R Distance (m)"
-p2.extra_y_ranges = {"foo": Range1d(start=0, end=max_vel)}
-p2.add_layout(LinearAxis(y_range_name="foo", axis_label="Speeds (m/s)"), 'right')
-dist = p2.line('x', 'y', source=dist_source, line_width=3, color='gray', muted_alpha=muted_alpha, line_dash="dashed", legend_label="distance", )
-vel_h = p2.line('x', 'y', source=vel_h_source, line_width=3, color='blue', muted_alpha=muted_alpha, y_range_name="foo", legend_label="speed h")
-vel_r = p2.line('x', 'y', source=vel_r_source, line_width=3, color='red', muted_alpha=muted_alpha, y_range_name="foo", legend_label="speed r")
+p2.yaxis.axis_label = "cost_danger/ cost_passby"
+c_danger = p2.line('x', 'y', source=c_danger_source, line_width=3, color='red', muted_alpha=muted_alpha, legend_label="c_danger")
+c_passby = p2.line('x', 'y', source=c_passby_source, line_width=3, color='blue', muted_alpha=muted_alpha, legend_label="c_passby")
 p2.legend.visible=False
 p2.legend.margin = margin
 p2.legend.click_policy=default_click_policy
@@ -394,28 +547,25 @@ p3.toolbar.logo = None
 p3.toolbar.autohide = False
 p3.toolbar_location = 'left'
 p3.add_tools(HoverTool(tooltips=TOOLTIPS))
-p3.yaxis.axis_label = "TTC (s)"
-p3.y_range = Range1d(0,10);
-p3.extra_y_ranges = {"foo2" : Range1d(start=0, end=max_rel_vel)}
-p3.add_layout(LinearAxis(y_range_name="foo2", axis_label="Relative speed (m/s)"), 'right')
-ttc = p3.cross('x', 'y', source=ttc_source, size=8, color='black', muted_alpha=muted_alpha, legend_label="TTC")
-rel_spd = p3.line('x', 'y', source=rel_spd_source, line_width=3, color='orange', muted_alpha=muted_alpha, y_range_name="foo2", legend_label="rel speed")
+p3.yaxis.axis_label = "cost_react/ cost_surprise"
+c_react = p3.line('x', 'y', source=c_react_source, line_width=3, color='blue', muted_alpha=muted_alpha, legend_label="c_react")
+c_surprise = p3.line('x', 'y', source=c_surprise_source, line_width=3, color='red', muted_alpha=muted_alpha, legend_label="c_surprise")
 p3.legend.visible=False
 p3.legend.margin = margin
 p3.legend.click_policy=default_click_policy
 
-p4 = figure(x_range=(min_x_default, max_x_default), tools=common_tools, active_scroll="wheel_zoom", frame_width=width, height=height, output_backend="webgl")
-p4.toolbar.logo = None
-p4.toolbar.autohide = False
-p4.toolbar_location = 'left'
-p4.add_tools(HoverTool(tooltips=TOOLTIPS, mode='vline'))
-p4.xaxis.axis_label = "Time (s)"
-p4.yaxis.axis_label = "Seen ratio  / Surprised"
-seen_ratio = p4.line('x', 'y', source=seen_ratio_source, line_width=3, color='black', muted_alpha=muted_alpha, legend_label="seen ratio")
-surprise = p4.circle('x', 'y', source=surprise_source, size=8, color='red', muted_alpha=muted_alpha, legend_label="surprised")
-p4.legend.visible=False
-p4.legend.margin = margin
-p4.legend.click_policy=default_click_policy
+# p4 = figure(x_range=(min_x_default, max_x_default), tools=common_tools, active_scroll="wheel_zoom", frame_width=width, height=height, output_backend="webgl")
+# p4.toolbar.logo = None
+# p4.toolbar.autohide = False
+# p4.toolbar_location = 'left'
+# p4.add_tools(HoverTool(tooltips=TOOLTIPS, mode='vline'))
+# p4.xaxis.axis_label = "Time (s)"
+# p4.yaxis.axis_label = "Seen ratio  / Surprised"
+# seen_ratio = p4.line('x', 'y', source=seen_ratio_source, line_width=3, color='black', muted_alpha=muted_alpha, legend_label="seen ratio")
+# surprise = p4.circle('x', 'y', source=surprise_source, size=8, color='red', muted_alpha=muted_alpha, legend_label="surprised")
+# p4.legend.visible=False
+# p4.legend.margin = margin
+# p4.legend.click_policy=default_click_policy
 
 ######################################################################################################
 ######################################## COLORED PATH ################################################
@@ -1015,6 +1165,15 @@ stop_play_button.on_click(stop_play_buttonCB)
 init_text_time_path_pretext = "time paused:"
 time_path_pretext = PreText(text=init_text_time_path_pretext)
 
+#Pretext New Metrics
+text_metrics = "  Danger: {:.2f}\n".format(cost_danger_max)\
+                + "  Passby: {:.2f}\n".format(cost_passby_max)\
+                + " Visible: {:.2f}\n".format(cost_visible_max)\
+                + "Surprise: {:.2f}\n".format(cost_surprise_max)\
+                + "   React:   {:.2f}".format(cost_react_max)
+init_text_metrics_pretext = "New Metrics\n"
+metrics_pretext = PreText(text=(init_text_metrics_pretext+text_metrics))
+
 # Div playing
 init_playing_div_text = "<b>Animation : </b>"
 playing_div = Div(text=init_playing_div_text + "stopped")
@@ -1031,7 +1190,7 @@ other_column = column(other_div, reset_button, set_range_mvt_button)
 t_range = row(column(t_min_input, row(t_min_minus_button, t_min_plus_button, align='center')), column(t_max_input, row(t_max_minus_button, t_max_plus_button, align='center')))
 range_column = column(range_div, t_range, reset_range_button)
 first_row_graph = row(plot_size_column, legend_column, range_column, other_column)
-graph_column = column(first_row_graph, p1, p2, p3, p4)
+graph_column = column(first_row_graph, p1, p2, p3, p4, metrics_pretext)
 anim_row = row(play_button, column(pause_button, resume_button, align="center"), stop_play_button, align="center")
 
 path_column = column(time_colored_path_div, p_path, anim_row, playing_div, time_path_pretext)

@@ -13,10 +13,12 @@
 <goals>
 
   <pose_goals>
-    <pose_goal type="pose_goal" x="24"  y="16.6"   theta="0.0" radius="0.0"/>
+    <pose_goal type="pose_goal" x="27"  y="16.6"   theta="0.0" radius="0.0"/>
     <pose_goal type="pose_goal" x="32.6"  y="16.6"   theta="0.0" radius="0.0"/>
     <pose_goal type="pose_goal" x="10.7"  y="16.6"   theta="0.0" radius="0.0"/>
     <pose_goal type="pose_goal" x="25.1"  y="26"   theta="0.0" radius="0.0"/>
+    <pose_goal type="pose_goal" x="6.0"  y="39.0"   theta="0.0" radius="0.0"/>
+    <pose_goal type="pose_goal" x="11.3"  y="36.3"   theta="-1.57" radius="0.0"/>
   </pose_goals>
 
   <named_goals>
@@ -25,18 +27,59 @@
   <scenarios>
 
     <appearance>
-      <init_h type="pose_goal" x="25.1" y="21.8" theta="-1.57" radius="0.0"/>
+      <init_h type="pose_goal" x="25.8" y="21.5" theta="-1.57" radius="0.0"/>
       <goal_h type="pose_goal" x="30.5" y="16.6" theta="0.0" radius="0.0"/>
-      <init_r type="pose_goal" x="31.0" y="16.6" theta="-3.14" radius="0.0"/>
+      <init_r type="pose_goal" x="30.0" y="16.6" theta="-3.14" radius="0.0"/>
       <goal_r type="pose_goal" x="25.1" y="26" theta="1.57" radius="0.0"/>
     </appearance>
 
+    <appearance_2>
+      <init_h type="pose_goal" x="21.5" y="36.5" theta="-3.14" radius="0.0"/>
+      <goal_h type="pose_goal" x="20.0" y="41.0" theta="-1.57" radius="0.0"/>
+      <init_r type="pose_goal" x="22.0" y="39.0" theta="-3.14" radius="0.0"/>
+      <goal_r type="pose_goal" x="16.0" y="39.0" theta="-3.14" radius="0.0"/>
+    </appearance_2>
+
+    <appearance3>
+      <init_h type="pose_goal" x="32" y="31" theta="-1.57" radius="0.0"/>
+      <goal_h type="pose_goal" x="27.5" y="27.2" theta="-3.14" radius="0.0"/>
+      <init_r type="pose_goal" x="27.5" y="26.5" theta="0" radius="0.0"/>
+      <goal_r type="pose_goal" x="32.5" y="32.5" theta="1.57" radius="0.0"/>
+    </appearance3>
+
     <corridor>
-      <init_h type="pose_goal" x="15" y="16.6" theta="0.0" radius="0.0"/>
+      <init_h type="pose_goal" x="10" y="16.6" theta="0.0" radius="0.0"/>
       <goal_h type="pose_goal" x="32.6" y="16.6" theta="0.0" radius="0.0"/>
-      <init_r type="pose_goal" x="30.5" y="16.6" theta="-3.14" radius="0.0"/>
+      <init_r type="pose_goal" x="31.0" y="16.6" theta="-3.14" radius="0.0"/>
       <goal_r type="pose_goal" x="10.7" y="16.6" theta="-3.14" radius="0.0"/>
     </corridor>
+
+    <back_to_front>
+      <init_h type="pose_goal" x="4.0" y="13" theta="1.57" radius="0.0"/>
+      <goal_r type="pose_goal" x="10.0" y="16.5" theta="0.0" radius="0.0"/>
+      <init_r type="pose_goal" x="7.5" y="8.5" theta="3.14" radius="0.0"/>
+    </back_to_front>
+
+    <approach>
+      <init_h type="pose_goal" x="18" y="5" theta="3.14" radius="0.0"/>
+      <goal_h type="pose_goal" x="10" y="5" theta="3.14" radius="0.0"/>
+      <init_r type="pose_goal" x="11" y="5" theta="0.0" radius="0.0"/>
+      <goal_r type="pose_goal" x="19" y="5" theta="0.0" radius="0.0"/>
+    </approach>
+
+    <follow>
+      <init_h type="pose_goal" x="12" y="3" theta="0.0" radius="0.0"/>
+      <goal_h type="pose_goal" x="18" y="3" theta="0.0" radius="0.0"/>
+      <init_r type="pose_goal" x="8" y="4" theta="0.0" radius="0.0"/>
+      <goal_r type="pose_goal" x="22" y="3.1" theta="0.0" radius="0.0"/>
+    </follow>
+
+    <back_to_front2>
+      <init_h type="pose_goal" x="7.0" y="7.0" theta="0.0" radius="0.0"/>
+      <goal_r type="pose_goal" x="9" y="7" theta="3.14" radius="0.0"/>
+      <init_r type="pose_goal" x="4" y="14" theta="-1.57" radius="0.0"/>
+    </back_to_front2>
+
 
   </scenarios>
 

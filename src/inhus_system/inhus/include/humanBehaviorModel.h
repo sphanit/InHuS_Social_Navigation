@@ -216,6 +216,7 @@ private:
 	inhus::PoseVel model_r_pose_vel_;
 
 	double ttc_;
+	double c_visibility;
 	double relative_speed_;
 	float human_radius_;
 	float robot_radius_;

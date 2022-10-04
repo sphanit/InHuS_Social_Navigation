@@ -1,6 +1,6 @@
 <launch>
 	<arg name="ns_human" default="human1"/>
-	<arg name="ns_robot" default=""/>
+	<arg name="ns_robot" default="smb"/>
 	<!-- ns_robot = "" or "smb" -->
 	<arg name="map_name" default="laas_adream"/>
 
@@ -10,7 +10,7 @@
 
 		<remap from="/robot/move_base_goal_status" to="/$(arg ns_robot)/move_base/status"/>
 		<remap from="/robot/move_base_goal" to="/$(arg ns_robot)/move_base_simple/goal"/>
-
+		<remap to="/robot/cmd_vel" from="/$(arg ns_robot)/cmd_vel"/>
 		<param name="map_name" value="$(arg map_name)"/>
 	</node>
 
