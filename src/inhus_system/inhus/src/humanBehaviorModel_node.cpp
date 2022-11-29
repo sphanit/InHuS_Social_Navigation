@@ -1224,8 +1224,8 @@ void HumanBehaviorModel::computeSurprise()
 			pub_log_.publish(msg_log_);
 
 			if(surprise_seen_ratio_ < 1.0){
-				c_visibility = c_visibility*(surprise_dist_/dist_eff);
-				msg_log_.data = "HUMAN_MODEL C_VISIBILITY " + std::to_string(c_visibility) + " " + std::to_string(ros::Time::now().toSec());
+				double c_visibile = c_visibility*(surprise_dist_/dist_eff);
+				msg_log_.data = "HUMAN_MODEL C_VISIBILITY " + std::to_string(c_visibile) + " " + std::to_string(ros::Time::now().toSec());
 				pub_log_.publish(msg_log_);
 			}
 			

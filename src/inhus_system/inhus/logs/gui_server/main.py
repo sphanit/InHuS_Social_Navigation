@@ -12,12 +12,16 @@ from bokeh.themes import built_in_themes
 import sys
 import numpy as np
 import math
+import csv
+import os
 
 absolute_path = ""
 map_name = "passage_hri"
 if len(sys.argv) >= 3:
     absolute_path = sys.argv[1] + "/"
     map_name = sys.argv[2]
+
+dir_path = os.path.dirname(os.path.realpath(__file__))
 
 ######################################################################################################
 ######################################################################################################
@@ -525,7 +529,7 @@ p1.toolbar.autohide = False
 p1.toolbar_location = 'left'
 p1.add_tools(HoverTool(tooltips=TOOLTIPS))
 p1.yaxis.axis_label = "cost_visibility"
-c_vis = p1.line('x', 'y', source=c_visible_source, line_width=3, color='blue', muted_alpha=muted_alpha, legend_label="c_visible")
+c_vis = p1.cross('x', 'y', source=c_visible_source, line_width=3, color='blue', muted_alpha=muted_alpha, legend_label="c_visible")
 p1.legend.visible=False
 p1.legend.margin = margin
 p1.legend.click_policy=default_click_policy
@@ -536,8 +540,8 @@ p2.toolbar.autohide = False
 p2.toolbar_location = 'left'
 p2.add_tools(HoverTool(tooltips=TOOLTIPS))
 p2.yaxis.axis_label = "cost_danger/ cost_passby"
-c_danger = p2.line('x', 'y', source=c_danger_source, line_width=3, color='red', muted_alpha=muted_alpha, legend_label="c_danger")
-c_passby = p2.line('x', 'y', source=c_passby_source, line_width=3, color='blue', muted_alpha=muted_alpha, legend_label="c_passby")
+c_danger = p2.cross('x', 'y', source=c_danger_source, line_width=3, color='red', muted_alpha=muted_alpha, legend_label="c_danger")
+c_passby = p2.cross('x', 'y', source=c_passby_source, line_width=3, color='blue', muted_alpha=muted_alpha, legend_label="c_passby")
 p2.legend.visible=False
 p2.legend.margin = margin
 p2.legend.click_policy=default_click_policy
@@ -548,8 +552,8 @@ p3.toolbar.autohide = False
 p3.toolbar_location = 'left'
 p3.add_tools(HoverTool(tooltips=TOOLTIPS))
 p3.yaxis.axis_label = "cost_react/ cost_surprise"
-c_react = p3.line('x', 'y', source=c_react_source, line_width=3, color='blue', muted_alpha=muted_alpha, legend_label="c_react")
-c_surprise = p3.line('x', 'y', source=c_surprise_source, line_width=3, color='red', muted_alpha=muted_alpha, legend_label="c_surprise")
+c_react = p3.cross('x', 'y', source=c_react_source, line_width=3, color='blue', muted_alpha=muted_alpha, legend_label="c_react")
+c_surprise = p3.cross('x', 'y', source=c_surprise_source, line_width=3, color='red', muted_alpha=muted_alpha, legend_label="c_surprise")
 p3.legend.visible=False
 p3.legend.margin = margin
 p3.legend.click_policy=default_click_policy
@@ -1034,6 +1038,32 @@ reset_button.js_on_click(CustomJS(args=dict(p1=p1, p2=p2, p3=p3, p4=p4),
     p4.reset.emit()
     """))
 
+# Button pause
+save_button = Button(label="Save Data", button_type="primary", width_policy="min", align="center")
+def save_buttonCB(event):
+    t_min=None
+    t_max=None
+    try:
+        t_min=float(t_min_input.value)
+    except:
+        print("reset range min wrong input ...")
+    try:
+        t_max=float(t_max_input.value)
+    except:
+        print("reset range max wrong input ...")
+
+    idx_min = vel_h_time.index(min(vel_h_time, key=lambda x:abs(x-t_min)))
+    idx_max = vel_h_time.index(min(vel_h_time, key=lambda x:abs(x-t_max)))
+
+    name = dir_path+"/data_"+str(t_min)+"_"+str(t_max)+".csv"
+    
+    with open(name, 'w') as f:
+        writer = csv.writer(f)
+        writer.writerow(vel_h_time[idx_min:idx_max])
+        writer.writerow(vel_h_data[idx_min:idx_max])
+        writer.writerow(vel_r_data[idx_min:idx_max])
+save_button.on_click(save_buttonCB)
+
 # Button Reset Plots Range
 reset_range_button = Button(label="Reset plots with range", button_type="primary", width_policy="min", align="center")
 def reset_range_buttonCB(event):
@@ -1186,7 +1216,7 @@ playing_div = Div(text=init_playing_div_text + "stopped")
 
 plot_size_column = column(plot_size_div, height_slider, width_slider, reset_plot_size_button)
 legend_column = column(legend_div, show_legend_button, hide_mute_button_div, hide_mute_button)
-other_column = column(other_div, reset_button, set_range_mvt_button)
+other_column = column(other_div, reset_button, set_range_mvt_button, save_button)
 t_range = row(column(t_min_input, row(t_min_minus_button, t_min_plus_button, align='center')), column(t_max_input, row(t_max_minus_button, t_max_plus_button, align='center')))
 range_column = column(range_div, t_range, reset_range_button)
 first_row_graph = row(plot_size_column, legend_column, range_column, other_column)
