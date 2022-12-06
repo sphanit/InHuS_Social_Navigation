@@ -18,4 +18,8 @@
 		<remap from="map" to="map_static"/>
 	</node>
 
+	<node name="map_server" pkg="map_server" type="map_server" ns="$(arg ns)" args="$(find inhus_navigation)/maps/junctions/junctions.yaml" if="$(eval 'junctions'==arg('map_name'))">
+		<remap from="map" to="map_static"/>
+	</node>
+
 </launch>

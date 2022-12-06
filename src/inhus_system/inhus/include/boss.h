@@ -55,6 +55,8 @@ class HumanManager : public AgentManager
 public:
 	HumanManager(string name);
 	void publishGoal(inhus::Goal goal);
+	void publishGoalH2();
+	void publishStartH2();
 	void publishManualCmd(geometry_msgs::Twist cmd);
 	void showState();
 
@@ -63,6 +65,7 @@ public:
 private:
 	ros::Publisher pub_attitude_;
 	ros::Publisher pub_manual_cmd_;
+	ros::Publisher pub_goal_human2_;
 
 	ros::Subscriber sub_goal_done_;
 	void goalDoneCB(const inhus::Goal::ConstPtr& msg);

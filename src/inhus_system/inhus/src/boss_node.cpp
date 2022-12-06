@@ -31,6 +31,8 @@ HumanManager::HumanManager(string name) : AgentManager(name)
 	string topic_goal = "/boss/" + name_ + "/new_goal";
 	pub_goal_ =	nh_.advertise<inhus::Goal>(topic_goal, 1);
 
+	pub_goal_human2_ = nh_.advertise<geometry_msgs::PoseStamped>("/human2/move_base_simple/goal", 1);
+
 	string topic_attitude = "/boss/" + name_ + "/set_attitude";
 	pub_attitude_ = nh_.advertise<std_msgs::Int32>(topic_attitude, 1);
 
@@ -45,11 +47,35 @@ HumanManager::HumanManager(string name) : AgentManager(name)
 
 	goal_done_ = true;
 	current_attitude_ = 0;
+	publishStartH2();
+	ROS_INFO("Helloo????");
 }
 
 void HumanManager::publishGoal(inhus::Goal goal)
 {
 	pub_goal_.publish(goal);
+}
+
+void HumanManager::publishStartH2()
+{
+	geometry_msgs::PoseStamped start;
+	// x = 24.2
+	// y = 21.0
+	// rw = 0.707
+	// rz = 0.707
+	start.header.frame_id = "map";
+	start.pose.position.x = 24.2;
+	start.pose.position.y = 21.0;
+	start.pose.orientation.w = 0.707;
+	start.pose.orientation.z = 0.707;
+
+	pub_goal_human2_.publish(start);
+}
+
+void HumanManager::publishGoalH2()
+{
+	geometry_msgs::PoseStamped goal;
+	pub_goal_human2_.publish(goal);
 }
 
 void HumanManager::publishManualCmd(geometry_msgs::Twist cmd)
@@ -901,8 +927,10 @@ int main(int argc, char** argv)
 	boss.appendAgent(&robot_manager1);
 
 	while(ros::ok())
-	{
+	{	
 		boss.showState();
 		boss.askChoice();
+		human_manager1.publishStartH2();
+
 	}
 }
