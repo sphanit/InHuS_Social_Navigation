@@ -1,0 +1,26 @@
+
+*** These modified files were found in JOE when it aborted on Tue Dec  6 12:21:53 2022
+*** JOE was aborted because the terminal closed
+
+*** File '/tmp/bash-fc.CzVJqu'
+q!
+
+
+*** File '(Unnamed)'
+/home/ptsingaman/Documents/.git/MERGE_MSG
+/home/ptsingaman/.git/COMMIT_EDITMSG
+/home/ptsingaman/Navigation_planner_melodic/src/morse_ros/.git/MERGE_MSG
+/home/ptsingaman/MuMMER_Nav/src/morse_ros/.git/MERGE_MSG
+/home/ptsingaman/morse/.git/COMMIT_EDITMSG
+/home/ptsingaman/morse/.git/COMMIT_EDITMSG
+/home/ptsingaman/morse/.git/COMMIT_EDITMSG
+/home/ptsingaman/morse/.git/COMMIT_EDITMSG
+/home/ptsingaman/Downloads/VMware-Player-15.5.0-14665864.x86_64.bundle
+/home/ptsingaman/Downloads/VMware-Player-15.5.6-16341506.x86_64.bundle
+/tmp/bash-fc.CzVJqu
+
+*** File '* Startup Log *'
+Processing '/etc/joe/editorrc'...
+Processing '/etc/joe/ftyperc'...
+Finished processing /etc/joe/ftyperc
+Finished processing /etc/joe/editorrc

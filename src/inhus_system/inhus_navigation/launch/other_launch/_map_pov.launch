@@ -20,5 +20,8 @@
 	<node name="map_server_pov" pkg="map_server" type="map_server" ns="$(arg ns)" args="$(find inhus_navigation)/maps/junctions/junctions_pov.yaml" if="$(eval 'junctions'==arg('map_name'))">
 		<remap from="map" to="map_pov"/>
 	</node>
+	<node name="map_server_pov" pkg="map_server" type="map_server" ns="$(arg ns)" args="$(find inhus_navigation)/maps/simple_junction/simple_junction_pov.yaml" if="$(eval 'simple_junction'==arg('map_name'))">
+		<remap from="map" to="map_pov"/>
+	</node>
 
 </launch>

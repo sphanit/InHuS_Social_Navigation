@@ -47,8 +47,6 @@ HumanManager::HumanManager(string name) : AgentManager(name)
 
 	goal_done_ = true;
 	current_attitude_ = 0;
-	publishStartH2();
-	ROS_INFO("Helloo????");
 }
 
 void HumanManager::publishGoal(inhus::Goal goal)
@@ -56,26 +54,18 @@ void HumanManager::publishGoal(inhus::Goal goal)
 	pub_goal_.publish(goal);
 }
 
-void HumanManager::publishStartH2()
+void HumanManager::publishGoalH2(inhus::Goal goal)
 {
-	geometry_msgs::PoseStamped start;
-	// x = 24.2
-	// y = 21.0
-	// rw = 0.707
-	// rz = 0.707
-	start.header.frame_id = "map";
-	start.pose.position.x = 24.2;
-	start.pose.position.y = 21.0;
-	start.pose.orientation.w = 0.707;
-	start.pose.orientation.z = 0.707;
+	geometry_msgs::PoseStamped Goal;
+	Goal.header.frame_id = "map";
+	Goal.pose.position.x = goal.pose_goal.pose.x;
+	Goal.pose.position.y = goal.pose_goal.pose.y;
+	tf2::Quaternion rot;
+	rot.setRPY(0.0,0.0,goal.pose_goal.pose.theta);
+	rot = rot.normalize();
+	Goal.pose.orientation = tf2::toMsg(rot);
 
-	pub_goal_human2_.publish(start);
-}
-
-void HumanManager::publishGoalH2()
-{
-	geometry_msgs::PoseStamped goal;
-	pub_goal_human2_.publish(goal);
+	pub_goal_human2_.publish(Goal);
 }
 
 void HumanManager::publishManualCmd(geometry_msgs::Twist cmd)
@@ -559,7 +549,7 @@ void Boss::askSendGoal()
 			agent_managers_[choice_agent]->publishGoal(pose_goals_[choice_-1]);
 
 			break;}
-		
+
 		// From named_goals
 		case 2:{
 			// Ask which named goal from list
@@ -689,6 +679,7 @@ void Boss::askScenario()
 		{
 			cout << "Publish goal : " << agent_managers_[agent1]->getName() << endl;
 			agent_managers_[agent1]->publishGoal(scenarios_[choice_scenario-1].init_h);
+			((HumanManager*) agent_managers_[agent1])->publishGoalH2(pose_goals_[0]);
 			cout << "Publish goal : " << agent_managers_[agent2]->getName() << endl;
 			agent_managers_[agent2]->publishGoal(scenarios_[choice_scenario-1].init_r);
 		}
@@ -696,6 +687,7 @@ void Boss::askScenario()
 		{
 			cout << "Publish goal : " << agent_managers_[agent1]->getName() << endl;
 			agent_managers_[agent1]->publishGoal(scenarios_[choice_scenario-1].goal_h);
+			((HumanManager*) agent_managers_[agent1])->publishGoalH2(pose_goals_[1]);
 			wait(delay);
 			cout << "Publish goal : " << agent_managers_[agent2]->getName() << endl;
 			agent_managers_[agent2]->publishGoal(scenarios_[choice_scenario-1].goal_r);
@@ -707,6 +699,7 @@ void Boss::askScenario()
 		{
 			cout << "Publish goal : " << agent_managers_[agent1]->getName() << endl;
 			agent_managers_[agent1]->publishGoal(scenarios_[choice_scenario-1].init_h);
+			((HumanManager*) agent_managers_[agent1])->publishGoalH2(pose_goals_[0]);
 			cout << "Publish goal : " << agent_managers_[agent2]->getName() << endl;
 			agent_managers_[agent2]->publishGoal(scenarios_[choice_scenario-1].init_r);
 		}
@@ -717,6 +710,8 @@ void Boss::askScenario()
 			wait(-delay);
 			cout << "Publish goal : " << agent_managers_[agent1]->getName() << endl;
 			agent_managers_[agent1]->publishGoal(scenarios_[choice_scenario-1].goal_h);
+			((HumanManager*) agent_managers_[agent1])->publishGoalH2(pose_goals_[1]);
+
 		}
 	}
 }
@@ -927,10 +922,9 @@ int main(int argc, char** argv)
 	boss.appendAgent(&robot_manager1);
 
 	while(ros::ok())
-	{	
+	{
 		boss.showState();
 		boss.askChoice();
-		human_manager1.publishStartH2();
 
 	}
 }

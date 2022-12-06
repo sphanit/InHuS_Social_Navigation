@@ -5,6 +5,7 @@
 #include <ros/package.h>
 #include "inhus/Goal.h"
 #include <tf2/LinearMath/Quaternion.h>
+#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include "move_base_msgs/MoveBaseGoal.h"
 #include "actionlib_msgs/GoalStatusArray.h"
 #include "geometry_msgs/PoseStamped.h"
@@ -55,8 +56,7 @@ class HumanManager : public AgentManager
 public:
 	HumanManager(string name);
 	void publishGoal(inhus::Goal goal);
-	void publishGoalH2();
-	void publishStartH2();
+	void publishGoalH2(inhus::Goal goal);
 	void publishManualCmd(geometry_msgs::Twist cmd);
 	void showState();
 
