@@ -13,8 +13,21 @@
 <goals>
 
   <pose_goals>
-    <pose_goal type="pose_goal" x="13.0"  y="11.2"   theta="1.57" radius="0.0"/>
-    <pose_goal type="pose_goal" x="24.0"  y="11.2"   theta="3.14" radius="0.0"/>
+    <!-- For scenario 4 -->
+    <!-- <pose_goal type="pose_goal" x="13.0"  y="11.2"   theta="0" radius="0.0"/>
+    <pose_goal type="pose_goal" x="24.0"  y="11.2"   theta="3.14" radius="0.0"/> -->
+    <!-- For Crossing -->
+    <!-- <pose_goal type="pose_goal" x="12.0"  y="5.0"   theta="1.57" radius="0.0"/>
+    <pose_goal type="pose_goal" x="12.0"  y="17.0"   theta="-1.57" radius="0.0"/> -->
+    <!-- For scene 3 -->
+    <!-- <pose_goal type="pose_goal" x="12.0"  y="2.0"   theta="1.57" radius="0.0"/>
+    <pose_goal type="pose_goal" x="12.0"  y="17.0"   theta="-1.57" radius="0.0"/> -->
+    <!-- For scene 1 -->
+    <!-- <pose_goal type="pose_goal" x="20.5"  y="1.8"   theta="0" radius="0.0"/>
+    <pose_goal type="pose_goal" x="20.5"  y="1.8"   theta="0" radius="0.0"/> -->
+    <!-- Static Placement -->
+    <pose_goal type="pose_goal" x="12.0"  y="2.0"   theta="0" radius="0.0"/>
+    <pose_goal type="pose_goal" x="12.0"  y="2.0"   theta="0" radius="0.0"/>
   </pose_goals>
 
   <named_goals>
@@ -30,11 +43,39 @@
     </junction_cross>
 
     <junction_towards>
-      <init_h type="pose_goal" x="12.0" y="3.2" theta="0" radius="0.0"/>
+      <init_h type="pose_goal" x="12.0" y="3.2" theta="1.57" radius="0.0"/>
       <goal_h type="pose_goal" x="20.0" y="10.6" theta="3.14" radius="0.0"/>
       <init_r type="pose_goal" x="18.0" y="10.5" theta="-3.14" radius="0.0"/>
       <goal_r type="pose_goal" x="12.5" y="6.0" theta="-1.57" radius="0.0"/>
     </junction_towards>
+
+    <junction_overtake>
+      <init_h type="pose_goal" x="20.0" y="11.7" theta="3.14" radius="0.0"/>
+      <goal_h type="pose_goal" x="13.0" y="11.7" theta="3.14" radius="0.0"/>
+      <init_r type="pose_goal" x="22.0" y="11.2" theta="-3.14" radius="0.0"/>
+      <goal_r type="pose_goal" x="6.0" y="11.2" theta="0.0" radius="0.0"/>
+    </junction_overtake>
+
+    <junction_overtake2>
+      <init_h type="pose_goal" x="25.8" y="9.0" theta="-1.57" radius="0.0"/>
+      <goal_h type="pose_goal" x="25.8" y="3.0" theta="-1.57" radius="0.0"/>
+      <init_r type="pose_goal" x="23.0" y="10.8" theta="0.0" radius="0.0"/>
+      <goal_r type="pose_goal" x="22.0" y="1.8" theta="3.14" radius="0.0"/>
+    </junction_overtake2>
+
+    <crossing_wide>
+      <init_h type="pose_goal" x="14.8" y="5.5" theta="0.0" radius="0.0"/>
+      <goal_h type="pose_goal" x="23.0" y="5.5" theta="0.0" radius="0.0"/>
+      <init_r type="pose_goal" x="23.0" y="5.5" theta="3.14" radius="0.0"/>
+      <goal_r type="pose_goal" x="14.8" y="5.5" theta="3.14" radius="0.0"/>
+    </crossing_wide>
+
+    <crossing_corridor>
+      <init_h type="pose_goal" x="13.8" y="11.2" theta="0.0" radius="0.0"/>
+      <goal_h type="pose_goal" x="24.0" y="11.2" theta="0.0" radius="0.0"/>
+      <init_r type="pose_goal" x="24.0" y="11.2" theta="3.14" radius="0.0"/>
+      <goal_r type="pose_goal" x="13.8" y="11.2" theta="3.14" radius="0.0"/>
+    </crossing_corridor>
 
   </scenarios>
 
