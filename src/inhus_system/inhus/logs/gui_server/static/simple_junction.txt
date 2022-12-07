@@ -1,0 +1,5 @@
+image: simple_junction.png
+size: 600 400
+resolution: 0.05
+offset: 0 0
+angle: 0

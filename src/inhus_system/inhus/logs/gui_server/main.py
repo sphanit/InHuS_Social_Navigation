@@ -795,8 +795,8 @@ map_img = p_path.image_url(url=['gui_server/static/' + img_file], anchor='center
 path_H = p_path.circle('x', 'y', source=path_H_source, name="path_h", color=colors, radius=radius_agents, muted_alpha=muted_alpha, legend_label="path H", view=view_h)
 path_R = p_path.circle('x', 'y', source=path_R_source, name="path_r", color=colors, radius=radius_agents, muted_alpha=muted_alpha, legend_label="path R", view=view_r)
 highlight_h = p_path.triangle('x', 'y', source=hover_h_source, color=colors, angle="theta", angle_units='rad', size=30, line_color="black", line_width=3)
-# highlight_r = p_path.triangle('x', 'y', source=hover_r_source, color=colors, angle="theta", angle_units='rad', size=30, line_color="black")
-highlight_r = p_path.image('x', 'y', source=hover_r_source, color=colors, angle="theta", angle_units='rad', size=30, line_color="black")
+highlight_r = p_path.triangle('x', 'y', source=hover_r_source, color=colors, angle="theta", angle_units='rad', size=30, line_color="black")
+# highlight_r = p_path.image('x', 'y', source=hover_r_source, color=colors, angle="theta", angle_units='rad', size=30, line_color="black")
 p_path.legend.click_policy = "hide"
 
 color_bar = ColorBar(title="Time (s)", color_mapper=mapper, width=8)
