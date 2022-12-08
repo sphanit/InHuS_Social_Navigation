@@ -81,7 +81,7 @@ bool ConflictManager::srvInitFirstPath(inhus::ActionBool::Request &req, inhus::A
     srv_make_plan_.request.start.pose.position.y = h_pose_vel_.pose.y;
     srv_make_plan_.request.goal.pose.position.x = req.action.target_pose.pose.position.x;
     srv_make_plan_.request.goal.pose.position.y = req.action.target_pose.pose.position.y;
-	
+
 	if(client_make_plan_.call(srv_make_plan_))
 	{
 		// Get path //
@@ -99,7 +99,7 @@ bool ConflictManager::srvInitFirstPath(inhus::ActionBool::Request &req, inhus::A
 		msg.data = "CONFLICT_MANAGER FIRST " + std::to_string(path_length) + " " + std::to_string(now.toSec());
 		pub_log_.publish(msg);
 	}
-	
+
 	return true;
 }
 
@@ -112,7 +112,7 @@ bool ConflictManager::srvCheckConflict(inhus::ActionBool::Request &req, inhus::A
     srv_make_plan_.request.start.pose.position.y = h_pose_vel_.pose.y;
     srv_make_plan_.request.goal.pose.position.x = req.action.target_pose.pose.position.x;
     srv_make_plan_.request.goal.pose.position.y = req.action.target_pose.pose.position.y;
-	
+
 	if(client_make_plan_.call(srv_make_plan_))
 	{
 		// Get path //
@@ -124,7 +124,7 @@ bool ConflictManager::srvCheckConflict(inhus::ActionBool::Request &req, inhus::A
 		ros::Time now = ros::Time::now();
 		msg.data = "CONFLICT_MANAGER PATH " + std::to_string(path_length) + " " + std::to_string(now.toSec());
 		pub_log_.publish(msg);
-		
+
 		// in order to always have a valid path stored in previous_path_
 		// the current_path is always uptaded but the previous is only
 		// updated if the current one wasn't empty
@@ -232,7 +232,7 @@ bool ConflictManager::srvCheckConflict(inhus::ActionBool::Request &req, inhus::A
 		ROS_INFO("CM: mean after = %f", mean_vel_.linear.x);
 		pub_vel_cmd_.publish(mean_local_vel);
 		ROS_INFO("CM: ######=> CONFLICT : publish cmd = %f, %f", mean_local_vel.linear.x, mean_local_vel.linear.y);
-		
+
 		current_action_ = req.action;
 		current_path_.poses.clear();
 		state_global_ = APPROACH;
@@ -597,6 +597,7 @@ HumanBehaviorModel::HumanBehaviorModel(ros::NodeHandle nh)
 
 	// Subscribers
 	sub_h_pose_vel_ = nh_.subscribe("interface/in/human_pose_vel", 100, &HumanBehaviorModel::hPoseVelCallback, this);
+	sub_h2_pose_vel_ = nh_.subscribe("/human2/odom", 100, &HumanBehaviorModel::h2PoseVelCallback, this);
 	sub_r_pose_vel_ = nh_.subscribe("interface/in/robot_pose_vel", 100, &HumanBehaviorModel::rPoseVelCallback, this);
 	sub_cmd_geo_ =		nh_.subscribe("cmd_geo", 100, &HumanBehaviorModel::cmdGeoCallback, this);
 	sub_goal_done_ =	nh_.subscribe("goal_done", 100, &HumanBehaviorModel::goalDoneCallback, this);
@@ -606,6 +607,7 @@ HumanBehaviorModel::HumanBehaviorModel(ros::NodeHandle nh)
 
 	// Publishers
 	pub_h_pose_vel_ = 	nh_.advertise<inhus::PoseVel>("known/human_pose_vel", 100);
+	pub_h2_pose_vel_ = 	nh_.advertise<inhus::PoseVel>("known/human2_pose_vel", 100);
 	pub_r_pose_vel_ = 	nh_.advertise<inhus::PoseVel>("known/robot_pose_vel", 100);
 	pub_new_goal_ = 	nh_.advertise<inhus::Goal>("new_goal", 100);
 	pub_perturbed_cmd_ = 	nh_.advertise<geometry_msgs::Twist>("perturbed_cmd", 100);
@@ -805,12 +807,14 @@ void HumanBehaviorModel::publishGoal(inhus::Goal goal)
 void HumanBehaviorModel::processSimData()
 {
 	model_h_pose_vel_ = sim_h_pose_vel_;
+	model_h2_pose_vel_ = sim_h2_pose_vel_;
 	model_r_pose_vel_ = sim_r_pose_vel_;
 }
 
 void HumanBehaviorModel::publishModelData()
 {
 	pub_h_pose_vel_.publish(model_h_pose_vel_);
+	pub_h2_pose_vel_.publish(model_h2_pose_vel_);
 	pub_r_pose_vel_.publish(model_r_pose_vel_);
 }
 
@@ -877,7 +881,7 @@ bool HumanBehaviorModel::initDone()
 void HumanBehaviorModel::updatePoseMarkers()
 {
 	tf2::Quaternion q;
-	
+
 	human_pose_marker_.markers[0].pose.position.x = model_h_pose_vel_.pose.x;
 	human_pose_marker_.markers[0].pose.position.y = model_h_pose_vel_.pose.y;
 	human_pose_marker_.markers[1].pose.position.x = model_h_pose_vel_.pose.x;
@@ -1167,7 +1171,7 @@ void HumanBehaviorModel::computeSurprise()
 			surprise_seen_ratio_ = 1.0;
 
 		// Test if seen ratio high enough compared to distance
-		// std::cout << "dist=" << dist_ << " "; 
+		// std::cout << "dist=" << dist_ << " ";
 		if(dist_ < surprise_dist_ && surprise_seen_ratio_ < 0.6)
 		{
 			// Human is surprised
@@ -1477,6 +1481,18 @@ void HumanBehaviorModel::hPoseVelCallback(const inhus::PoseVel::ConstPtr& msg)
 		//ROS_INFO("HBM: hcb");
 		hcb_=true;
 	}
+}
+
+void HumanBehaviorModel::h2PoseVelCallback(const nav_msgs::Odometry::ConstPtr& msg)
+{	tf::Quaternion q(msg->pose.pose.orientation.x,msg->pose.pose.orientation.y,msg->pose.pose.orientation.z,msg->pose.pose.orientation.w);
+	tf::Matrix3x3 m(q);
+	double h_roll, h_pitch, h_yaw;
+	m.getRPY(h_roll, h_pitch, h_yaw);
+
+	sim_h2_pose_vel_.pose.x=msg->pose.pose.position.x;
+	sim_h2_pose_vel_.pose.y=msg->pose.pose.position.y;
+	sim_h2_pose_vel_.pose.theta=h_yaw;
+	sim_h2_pose_vel_.vel=msg->twist.twist;
 }
 
 void HumanBehaviorModel::rPoseVelCallback(const inhus::PoseVel::ConstPtr& msg)

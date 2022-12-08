@@ -14,6 +14,7 @@
 #include "geometry_msgs/Twist.h"
 #include "navfn/MakeNavPlan.h"
 #include "nav_msgs/OccupancyGrid.h"
+#include "nav_msgs/Odometry.h"
 #include "nav_msgs/Path.h"
 #include "nav_msgs/GetPlan.h"
 #include "std_msgs/Int32.h"
@@ -31,6 +32,7 @@
 #include "inhus/Goal.h"
 #include "inhus/ActionBool.h"
 #include "inhus_navigation/PlaceRobot.h"
+#include "tf/tf.h"
 
 class ConflictManager
 {
@@ -165,6 +167,8 @@ private:
 	// Subscribers //
 	ros::Subscriber sub_h_pose_vel_;
 	void hPoseVelCallback(const inhus::PoseVel::ConstPtr& msg);
+	ros::Subscriber sub_h2_pose_vel_;
+	void h2PoseVelCallback(const nav_msgs::Odometry::ConstPtr& msg);
 	ros::Subscriber sub_r_pose_vel_;
 	void rPoseVelCallback(const inhus::PoseVel::ConstPtr& msg);
 	ros::Subscriber sub_cmd_geo_;
@@ -180,7 +184,7 @@ private:
 
 	// Publishers //
 	ros::Publisher pub_new_goal_;
-	ros::Publisher pub_h_pose_vel_;
+	ros::Publisher pub_h_pose_vel_, pub_h2_pose_vel_;
 	ros::Publisher pub_r_pose_vel_;
 	ros::Publisher pub_perturbed_cmd_;
 	ros::Publisher pub_cancel_goal_;
@@ -209,10 +213,10 @@ private:
 	//// Variables ////
 	ros::NodeHandle nh_;
 
-	inhus::PoseVel sim_h_pose_vel_;
+	inhus::PoseVel sim_h_pose_vel_, sim_h2_pose_vel_;
 	inhus::PoseVel sim_r_pose_vel_;
 
-	inhus::PoseVel model_h_pose_vel_;
+	inhus::PoseVel model_h_pose_vel_, model_h2_pose_vel_;
 	inhus::PoseVel model_r_pose_vel_;
 
 	double ttc_;

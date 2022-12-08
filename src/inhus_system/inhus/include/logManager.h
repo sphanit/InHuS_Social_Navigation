@@ -6,11 +6,9 @@
 #include "std_msgs/String.h"
 #include "geometry_msgs/Twist.h"
 #include "geometry_msgs/Pose2D.h"
-#include "nav_msgs/Odometry.h"
 #include <fstream>
 #include <math.h>
 #include "inhus/PoseVel.h"
-#include "tf/tf.h"
 
 using namespace std;
 
@@ -22,8 +20,8 @@ public:
 
 	void logCallback(const std_msgs::String::ConstPtr& msg);
 	void hPoseVelCallback(const inhus::PoseVel::ConstPtr& msg);
+	void h2PoseVelCallback(const inhus::PoseVel::ConstPtr& msg);
 	void rPoseVelCallback(const inhus::PoseVel::ConstPtr& msg);
-	void h2PoseVelCallback(const nav_msgs::Odometry::ConstPtr& msg);
 
 private:
 	ros::NodeHandle nh_;
