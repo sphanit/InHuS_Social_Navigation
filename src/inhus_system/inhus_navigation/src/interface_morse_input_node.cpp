@@ -92,9 +92,9 @@ int main(int argc, char** argv)
 	////////////////////////////
 	////  Input Subscribers //// Part to modify for another simulator
   	////////////////////////////
-	ros::Subscriber sub_human_marker = nh.subscribe("/morse_agents/human1/marker", 10, humanCallback);
-	ros::Subscriber sub_robot_marker = nh.subscribe("/morse_agents/pr2/marker", 10, robotCallback);
-	ros::Subscriber sub_human_odom = nh.subscribe("/morse_agents/human1/odom", 10, humanOdomCallback);
+	ros::Subscriber sub_human_marker = nh.subscribe("/human1/marker", 10, humanCallback);
+	ros::Subscriber sub_robot_marker = nh.subscribe("/pr2/marker", 10, robotCallback);
+	ros::Subscriber sub_human_odom = nh.subscribe("/human1/odom", 10, humanOdomCallback);
 	////////////////////////////
 	////////////////////////////
 	////////////////////////////

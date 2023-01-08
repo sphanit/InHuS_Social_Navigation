@@ -3,6 +3,12 @@
   <arg name="map_name" default="laas_adream"/>
   <arg name="node_start_delay" default="2.0"/>
 
+  <!-- Interface with the simulator -->
+  <include file="$(find inhus_navigation)/launch/simulator_launch/include/_stage_interface.launch">
+    <arg name="ns" value="$(arg ns)"/>
+    <arg name="num_agents" value="$(arg num_agents)"/>
+  </include>
+
   <!-- localization and maps -->
   <include file="$(find inhus_navigation)/launch/inhus_nav_launch/include/_locate_pub.launch">
     <arg name="ns" value="$(arg ns)"/>
@@ -31,6 +37,8 @@
   </include>
 
   <!-- visualization with Rviz -->
-  <include file="$(find inhus_navigation)/launch/other_launch/_rviz.launch"/>
+  <!--include file="$(find inhus_navigation)/launch/other_launch/_rviz.launch"/-->
+
+
 
 </launch>
