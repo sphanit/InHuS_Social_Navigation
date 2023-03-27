@@ -127,6 +127,7 @@ public:
 	void computeRelSpd();
 	void computeSurprise();
 	void testSeeRobot();
+	void testSeeHuman();
 	void updateConflictManager();
 	void initConflictManager(ConflictManager* conflict_manager);
 	void conflictManagerLoop();
@@ -220,6 +221,7 @@ private:
 	inhus::PoseVel model_r_pose_vel_;
 
 	double ttc_;
+	double c_visibility;
 	double relative_speed_;
 	float human_radius_;
 	float robot_radius_;
@@ -250,6 +252,7 @@ private:
 	bool pmcb_;
 	std::vector<std::vector<int>> g_map_;
 	float fov_;
+	float robot_fov_;
 	float resol_pov_map_;
 	ros::Rate check_see_robot_freq_;
 	ros::Time last_check_see_robot_;
@@ -258,6 +261,7 @@ private:
 	ros::Time last_seen_robot_;
 	ros::Duration delay_forget_robot_;
 	bool see_;
+	bool robot_see_;
 
 	// Surprise
 	ros::Duration surprise_full_increase_durr_;

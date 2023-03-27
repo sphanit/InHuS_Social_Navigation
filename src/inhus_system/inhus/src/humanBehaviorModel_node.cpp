@@ -557,9 +557,10 @@ HumanBehaviorModel::HumanBehaviorModel(ros::NodeHandle nh)
 	srand(time(NULL));
 
 	// Ros Params
-	ros::NodeHandle private_nh("~"); float f_nb; int fov_int;
+	ros::NodeHandle private_nh("~"); float f_nb; int fov_int, robot_fov_int;
 	private_nh.param(std::string("ratio_perturbation_cmd"), ratio_perturbation_cmd_, float(0.0));
 	private_nh.param(std::string("fov"), fov_int, int(180)); fov_ = fov_int*PI/180;
+	private_nh.param(std::string("robot_fov"), robot_fov_int, int(180)); robot_fov_ = robot_fov_int*PI/180;
 	private_nh.param(std::string("check_see_robot_freq"), f_nb, float(5.0)); check_see_robot_freq_ = ros::Rate(f_nb);
 	private_nh.param(std::string("delay_forget_robot"), f_nb, float(1.5)); delay_forget_robot_ = ros::Duration(f_nb);
 	private_nh.param(std::string("human_radius"), human_radius_, float(0.25));
@@ -578,6 +579,7 @@ HumanBehaviorModel::HumanBehaviorModel(ros::NodeHandle nh)
 	ROS_INFO("HBM: => Params HBM:");
 	ROS_INFO("HBM: ratio_perturbation_cmd=%f", ratio_perturbation_cmd_);
 	ROS_INFO("HBM: fov_int=%d fov=%f", fov_int, fov_);
+	ROS_INFO("HBM: robot_fov_int=%d robot_fov=%f", robot_fov_int, robot_fov_);
 	ROS_INFO("HBM: check_see_robot_freq=%f", 1/check_see_robot_freq_.expectedCycleTime().toSec());
 	ROS_INFO("HBM: delay_forget_robot=%f", delay_forget_robot_.toSec());
 	ROS_INFO("HBM: human_radius=%f", human_radius_);
@@ -656,6 +658,7 @@ HumanBehaviorModel::HumanBehaviorModel(ros::NodeHandle nh)
 	radius_sum_sq_ = human_radius_ + robot_radius_;
 	radius_sum_sq_ *= radius_sum_sq_;
 	ttc_ = -1.0;
+	c_visibility = -1.0;
 
 	hcb_ = 		false;
 	rcb_ = 		false;
@@ -827,42 +830,79 @@ void HumanBehaviorModel::pubDist()
 
 void HumanBehaviorModel::computeTTC()
 {
-	ttc_ = -1.0; // ttc infinite
+	if(robot_see_){
+		ttc_ = -1.0; // ttc infinite
+		double c_danger = -1;
+		double c_passby = -1;
 
-	geometry_msgs::Pose2D C; // robot human relative position
-	C.x = model_h_pose_vel_.pose.x - model_r_pose_vel_.pose.x;
-	C.y = model_h_pose_vel_.pose.y - model_r_pose_vel_.pose.y;
-	double C_sq = C.x*C.x + C.y*C.y; // dot product C.C, distance robot human
+		geometry_msgs::Pose2D C; // robot human relative position
+		C.x = model_h_pose_vel_.pose.x - model_r_pose_vel_.pose.x;
+		C.y = model_h_pose_vel_.pose.y - model_r_pose_vel_.pose.y;
+		double C_sq = C.x*C.x + C.y*C.y; // dot product C.C, distance robot human
 
-	double robot_inflated_radius = robot_radius_*C_sq/dist_radius_inflation_;
-	if(robot_inflated_radius < robot_radius_)
-		robot_inflated_radius = robot_radius_;
-	radius_sum_sq_ = human_radius_ + robot_inflated_radius;
-	radius_sum_sq_ *= radius_sum_sq_;
-	if(C_sq <= radius_sum_sq_) // already touching
-		ttc_ = 0.0;
-	else
-	{
-		geometry_msgs::Twist V; // relative velocity human to robot
-		V.linear.x = model_r_pose_vel_.vel.linear.x - model_h_pose_vel_.vel.linear.x;
-		V.linear.y = model_r_pose_vel_.vel.linear.y - model_h_pose_vel_.vel.linear.y;
+		// Previous
+		// double robot_inflated_radius = robot_radius_*C_sq/dist_radius_inflation_;
 
-		double C_dot_V = C.x*V.linear.x + C.y*V.linear.y;
+		// New
+		double robot_inflated_radius = robot_radius_;
 
-		if(C_dot_V > 0) // otherwise ttc infinite
+		if(robot_inflated_radius < robot_radius_)
+			robot_inflated_radius = robot_radius_;
+		double radius_sum = human_radius_ + robot_inflated_radius;
+		radius_sum_sq_ = human_radius_ + robot_inflated_radius;
+		radius_sum_sq_ *= radius_sum_sq_;
+		if(C_sq <= radius_sum_sq_) // already touching
+			ttc_ = 0.0;
+		else
 		{
-			double V_sq = V.linear.x*V.linear.x + V.linear.y*V.linear.y;
-			double f = (C_dot_V * C_dot_V) - (V_sq * (C_sq - radius_sum_sq_));
-			if(f > 0) // otherwise ttc infinite
-				ttc_ = (C_dot_V - sqrt(f)) / V_sq;
-		}
-	}
+			geometry_msgs::Twist V; // relative velocity human to robot
+			V.linear.x = model_r_pose_vel_.vel.linear.x - model_h_pose_vel_.vel.linear.x;
+			V.linear.y = model_r_pose_vel_.vel.linear.y - model_h_pose_vel_.vel.linear.y;
 
-	if(ttc_ != -1)
-	{
-		// ROS_INFO("HBM: TTC = %f", ttc_);
-		msg_log_.data = "HUMAN_MODEL TTC " + std::to_string(ttc_) + " " + std::to_string(ros::Time::now().toSec());
-		pub_log_.publish(msg_log_);
+			double C_dot_V = C.x*V.linear.x + C.y*V.linear.y;
+
+			if(C_dot_V > 0) // otherwise ttc infinite
+			{
+				double V_sq = V.linear.x*V.linear.x + V.linear.y*V.linear.y;
+				double f = (C_dot_V * C_dot_V) - (V_sq * (C_sq - radius_sum_sq_));
+				if(f > 0) // otherwise ttc infinite
+				{	
+					ttc_ = (C_dot_V - sqrt(f)) / V_sq;
+				}
+
+				else
+				{
+					double g = sqrt(V_sq*C_sq - C_dot_V*C_dot_V);
+					// std::cout <<g << "\n";
+					if((g - (sqrt(V_sq)*radius_sum))>0.1)
+					{
+						c_passby = sqrt(V_sq/C_sq)*(g/(g - (sqrt(V_sq)*radius_sum)));
+					}
+				}
+			}
+		}
+
+		if(ttc_ != -1)
+		{
+			// ROS_INFO("HBM: TTC = %f", ttc_);
+			if(abs(model_r_pose_vel_.vel.linear.x)>0.001 || abs(model_r_pose_vel_.vel.linear.y)>0.001){
+			msg_log_.data = "HUMAN_MODEL TTC " + std::to_string(ttc_) + " " + std::to_string(ros::Time::now().toSec());
+			pub_log_.publish(msg_log_);
+			}
+
+			if(ttc_ > 0)
+			{
+				c_danger = 1/ttc_;
+			}
+		}
+
+		if(abs(model_r_pose_vel_.vel.linear.x)>0.001 || abs(model_r_pose_vel_.vel.linear.y)>0.001){
+			msg_log_.data = "HUMAN_MODEL C_DANGER " + std::to_string(c_danger) + " " + std::to_string(ros::Time::now().toSec());
+			pub_log_.publish(msg_log_);
+
+			msg_log_.data = "HUMAN_MODEL C_PASSBY " + std::to_string(c_passby) + " " + std::to_string(ros::Time::now().toSec());
+			pub_log_.publish(msg_log_);
+		}
 	}
 }
 
@@ -1013,6 +1053,7 @@ bool HumanBehaviorModel::testObstacleView(geometry_msgs::Pose2D A_real, geometry
 bool HumanBehaviorModel::testFOV(geometry_msgs::Pose2D A, geometry_msgs::Pose2D B, float fov)
 {
 	// check if A is in the specified field of view of B (w/o obstacle)
+	c_visibility = -1.0;
 	float alpha;
 	float qy = A.y - B.y;
 	float qx = A.x - B.x;
@@ -1053,6 +1094,7 @@ bool HumanBehaviorModel::testFOV(geometry_msgs::Pose2D A, geometry_msgs::Pose2D 
 			diff = std::min(abs(alpha - B.theta), abs(alpha - (B.theta+2*PI)));
 	}
 
+	c_visibility = diff/(fov/2);
 	return diff < fov/2;
 }
 
@@ -1156,6 +1198,49 @@ void HumanBehaviorModel::testSeeRobot()
 	}
 }
 
+void HumanBehaviorModel::testSeeHuman()
+{
+	// if(ros::Time::now() - last_check_see_robot_ > check_see_robot_freq_.expectedCycleTime())
+	{
+		geometry_msgs::Pose2D human_pose_offset = model_h_pose_vel_.pose;
+		human_pose_offset.x -= offset_pov_map_x_;
+		human_pose_offset.y -= offset_pov_map_y_;
+		geometry_msgs::Pose2D robot_pose_offset = model_r_pose_vel_.pose;
+		robot_pose_offset.x -= offset_pov_map_x_;
+		robot_pose_offset.y -= offset_pov_map_y_;
+
+		// check if the human is in the field of view of the robot
+		// (without obstacles)
+		if(this->testFOV(human_pose_offset, robot_pose_offset, robot_fov_))
+		{
+			// check if there are obstacles blocking the robot view of the human
+			if(this->testObstacleView(robot_pose_offset, human_pose_offset))
+			{
+				// the robot sees the human
+				// ROS_INFO("HBM: I SEE");
+				robot_see_ = true;
+				// last_seen_robot_ = ros::Time::now();
+			}
+			else
+			{
+				// robot can't see the human
+				// ROS_INFO("HBM: VIEW IS BLOCKED");
+				robot_see_ = false;
+			}
+		}
+		else
+		{
+			// ROS_INFO("HBM: NOT IN FOV");
+			robot_see_ = false;
+		}
+
+		// Update robot on map if needed
+		// this->updateRobotOnMap();
+
+		// last_check_see_robot_ = ros::Time::now();
+	}
+}
+
 void HumanBehaviorModel::computeSurprise()
 {
 	ros::Duration delta_t = ros::Time::now() - surprise_last_compute_;
@@ -1179,6 +1264,31 @@ void HumanBehaviorModel::computeSurprise()
 			msg_log_.data = "HUMAN_MODEL SURPRISED " + std::to_string(ros::Time::now().toSec());
 			pub_log_.publish(msg_log_);
 		}
+		// std::cout << model_r_pose_vel_.vel.linear.x << "\n";
+		if(abs(model_r_pose_vel_.vel.linear.x)>0.001 || abs(model_r_pose_vel_.vel.linear.y)>0.001){
+			double dist_eff = dist_ - sqrt(radius_sum_sq_);
+
+			double c_react = (1-surprise_seen_ratio_)*(surprise_dist_/dist_eff);
+			msg_log_.data = "HUMAN_MODEL C_REACT " + std::to_string(c_react) + " " + std::to_string(ros::Time::now().toSec());
+			pub_log_.publish(msg_log_);
+
+			if(surprise_seen_ratio_ < 1.0){
+				c_visibility = c_visibility*(surprise_dist_/dist_eff);
+				msg_log_.data = "HUMAN_MODEL C_VISIBILITY " + std::to_string(c_visibility) + " " + std::to_string(ros::Time::now().toSec());
+				pub_log_.publish(msg_log_);
+			}
+			
+			if(surprise_seen_ratio_ <= 0.25)
+			{
+				// Human is surprised
+				// std::cout << "SURPRISED ";
+				double c_surprise = std::max((double)(1-surprise_seen_ratio_*4)*(surprise_dist_/dist_eff),0.0);
+				msg_log_.data = "HUMAN_MODEL C_SURPRISE " + std::to_string(c_surprise) + " " + std::to_string(ros::Time::now().toSec());
+				pub_log_.publish(msg_log_);
+			}
+		}
+
+
 	}
 	else
 	{
@@ -1653,6 +1763,9 @@ int main(int argc, char** argv)
 
 		// Update robot pose knowledge
 		human_model.testSeeRobot();
+
+		// Update the robot's visibility knowledge
+		human_model.testSeeHuman();
 
 		// Update data of Conflict Manager
 		human_model.updateConflictManager();

@@ -36,6 +36,9 @@ humanBehaviorModel_node: ##
   delay_forget_robot: 1.5
     #=> delay after the last time the robot has been seen to forget the robot pose
 
+### Check see Human
+  robot_fov: 180
+
 ### TTC
   human_radius: 0.3
   robot_radius: 0.3
