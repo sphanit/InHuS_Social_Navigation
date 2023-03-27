@@ -663,56 +663,85 @@ void Boss::askScenario()
 
 	// Get delay if start
 	float delay;
+	int repeat = 1;
 	if(choice_init == 2)
 	{
 		while(ros::ok() && (cout << "Delay " << agent_managers_[agent2]->getName() << " (s) ? ")
 		&& (!(cin >> delay)))
 			cleanInput();
+		
+		while(ros::ok() && (cout << "# Repeat: ")
+		&& (!(cin >> repeat)))
+			cleanInput();
 	}
 	else
 		delay=0;
 
-	// Publish goals // init_h_r goal_h_r hardcoded, bypass the agent1 and agent2
-	if(delay>=0)
-	{
-		if(choice_init==1)
-		{
-			cout << "Publish goal : " << agent_managers_[agent1]->getName() << endl;
-			agent_managers_[agent1]->publishGoal(scenarios_[choice_scenario-1].init_h);
-			((HumanManager*) agent_managers_[agent1])->publishGoalH2(pose_goals_[0]);
-			cout << "Publish goal : " << agent_managers_[agent2]->getName() << endl;
-			agent_managers_[agent2]->publishGoal(scenarios_[choice_scenario-1].init_r);
-		}
-		else
-		{
-			cout << "Publish goal : " << agent_managers_[agent1]->getName() << endl;
-			agent_managers_[agent1]->publishGoal(scenarios_[choice_scenario-1].goal_h);
-			((HumanManager*) agent_managers_[agent1])->publishGoalH2(pose_goals_[1]);
-			wait(delay);
-			cout << "Publish goal : " << agent_managers_[agent2]->getName() << endl;
-			agent_managers_[agent2]->publishGoal(scenarios_[choice_scenario-1].goal_r);
-		}
-	}
-	else
-	{
-		if(choice_init==1)
-		{
-			cout << "Publish goal : " << agent_managers_[agent1]->getName() << endl;
-			agent_managers_[agent1]->publishGoal(scenarios_[choice_scenario-1].init_h);
-			((HumanManager*) agent_managers_[agent1])->publishGoalH2(pose_goals_[0]);
-			cout << "Publish goal : " << agent_managers_[agent2]->getName() << endl;
-			agent_managers_[agent2]->publishGoal(scenarios_[choice_scenario-1].init_r);
-		}
-		else
-		{
-			cout << "Publish goal : " << agent_managers_[agent2]->getName() << endl;
-			agent_managers_[agent2]->publishGoal(scenarios_[choice_scenario-1].goal_r);
-			wait(-delay);
-			cout << "Publish goal : " << agent_managers_[agent1]->getName() << endl;
-			agent_managers_[agent1]->publishGoal(scenarios_[choice_scenario-1].goal_h);
-			((HumanManager*) agent_managers_[agent1])->publishGoalH2(pose_goals_[1]);
+	// repeat scenarios given number of times
+	bool first_called = true;
 
+	while(repeat){
+		// Publish goals // init_h_r goal_h_r hardcoded, bypass the agent1 and agent2
+		if(delay>=0)
+		{
+			if(choice_init==1)
+			{
+				cout << "Publish goal : " << agent_managers_[agent1]->getName() << endl;
+				agent_managers_[agent1]->publishGoal(scenarios_[choice_scenario-1].init_h);
+				((HumanManager*) agent_managers_[agent1])->publishGoalH2(pose_goals_[0]);
+				cout << "Publish goal : " << agent_managers_[agent2]->getName() << endl;
+				agent_managers_[agent2]->publishGoal(scenarios_[choice_scenario-1].init_r);
+
+				if(first_called){
+					repeat--;
+					first_called = false;
+				}
+			}
+			else
+			{
+				cout << "Publish goal : " << agent_managers_[agent1]->getName() << endl;
+				agent_managers_[agent1]->publishGoal(scenarios_[choice_scenario-1].goal_h);
+				((HumanManager*) agent_managers_[agent1])->publishGoalH2(pose_goals_[1]);
+				wait(delay);
+				cout << "Publish goal : " << agent_managers_[agent2]->getName() << endl;
+				agent_managers_[agent2]->publishGoal(scenarios_[choice_scenario-1].goal_r);
+				first_called = false;
+				repeat--;
+			}
 		}
+		else
+		{
+			if(choice_init==1)
+			{
+				cout << "Publish goal : " << agent_managers_[agent1]->getName() << endl;
+				agent_managers_[agent1]->publishGoal(scenarios_[choice_scenario-1].init_h);
+				((HumanManager*) agent_managers_[agent1])->publishGoalH2(pose_goals_[0]);
+				cout << "Publish goal : " << agent_managers_[agent2]->getName() << endl;
+				agent_managers_[agent2]->publishGoal(scenarios_[choice_scenario-1].init_r);
+
+				if(first_called){
+					repeat--;
+					first_called = false;
+				}
+			}
+			else
+			{
+				cout << "Publish goal : " << agent_managers_[agent2]->getName() << endl;
+				agent_managers_[agent2]->publishGoal(scenarios_[choice_scenario-1].goal_r);
+				wait(-delay);
+				cout << "Publish goal : " << agent_managers_[agent1]->getName() << endl;
+				agent_managers_[agent1]->publishGoal(scenarios_[choice_scenario-1].goal_h);
+				((HumanManager*) agent_managers_[agent1])->publishGoalH2(pose_goals_[1]);
+				first_called = false;
+				repeat--;
+
+			}
+		}
+		wait(26.0);
+		if(choice_init==1)
+			choice_init=2;
+		else if(choice_init==2)
+			choice_init=1;
 	}
 }
 

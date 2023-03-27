@@ -29,9 +29,32 @@
     <appearance>
       <init_h type="pose_goal" x="25.8" y="21.8" theta="-1.57" radius="0.0"/>
       <goal_h type="pose_goal" x="30.5" y="16.6" theta="0.0" radius="0.0"/>
-      <init_r type="pose_goal" x="31.0" y="16.6" theta="-3.14" radius="0.0"/>
+      <init_r type="pose_goal" x="30.0" y="16.6" theta="-3.14" radius="0.0"/>
       <goal_r type="pose_goal" x="25.1" y="26" theta="1.57" radius="0.0"/>
     </appearance>
+
+    <approach>
+      <init_h type="pose_goal" x="7.0" y="7.0" theta="0.0" radius="0.0"/>
+      <goal_h type="pose_goal" x="7.0" y="7.0" theta="0.0" radius="0.0"/>
+      <init_r type="pose_goal" x="4.0" y="14.0" theta="-1.57" radius="0.0"/>
+      <goal_r type="pose_goal" x="9.0" y="7.0" theta="3.14" radius="0.0"/>
+    </approach>
+
+    <cross>
+      <init_h type="pose_goal" x="18.0" y="5.0" theta="3.14" radius="0.0"/>
+      <goal_h type="pose_goal" x="10.0" y="5.0" theta="3.14" radius="0.0"/>
+      <init_r type="pose_goal" x="11.0" y="5.0" theta="0.0" radius="0.0"/>
+      <goal_r type="pose_goal" x="19.0" y="5.0" theta="0.0" radius="0.0"/>
+    </cross>
+
+    <overtake>
+      <init_h type="pose_goal" x="12.0" y="3.0" theta="0.0" radius="0.0"/>
+      <goal_h type="pose_goal" x="18.0" y="3.0" theta="0.0" radius="0.0"/>
+      <init_r type="pose_goal" x="8.0" y="4.0" theta="0.0" radius="0.0"/>
+      <goal_r type="pose_goal" x="22.0" y="3.0" theta="0.0" radius="0.0"/>
+    </overtake>
+
+
 
     <appearance_2>
       <init_h type="pose_goal" x="21.5" y="36.5" theta="-3.14" radius="0.0"/>
