@@ -1,0 +1,42 @@
+<launch>
+    <arg name="robot_planner" default="cohan"/>
+	<arg name="scene" default="overtake"/>
+
+	<!-- Update Dynamic parameters -->
+	<!-- For SMB -->
+	<group if="$(eval 'smb'==arg('robot_planner'))">
+		<param name="device" command="rosrun dynamic_reconfigure dynparam set /move_base/global_costmap/inflater_layer cost_scaling_factor 2.0 " if="$(eval 'approach'==arg('scene'))"/>
+	</group>
+
+
+	<!-- For cohan -->
+	<group if="$(eval 'cohan'==arg('robot_planner'))">
+		<!-- For overtake scene -->
+		<group if="$(eval 'approach'==arg('scene'))">
+			<param name="device" command="rosrun dynamic_reconfigure dynparam set /move_base/global_costmap/human_layer_visible '{'radius':2.0, 'amplitude':253}' "/>
+			<param name="device" command="rosrun dynamic_reconfigure dynparam set /move_base/global_costmap/human_layer_static radius 2.0"/>	
+		</group>
+		<!-- For all scenes except appear -->
+		<group unless="$(eval 'appear'==arg('scene'))">
+			<param name="device" command="rosrun dynamic_reconfigure dynparam set /move_base/HATebLocalPlannerROS 
+										'{'weight_agent_robot_safety': 5.0, 'visibility_cost_threshold': 1.0, 'use_external_prediction': False,
+										'rel_vel_cost_threshold': 1.2, 'min_agent_robot_dist': 1.4, 'predict_agent_behind_robot': False}'"/>
+		</group>
+		<!-- For appear scene -->
+		<group if="$(eval 'appear'==arg('scene'))">
+			<param name="device" command="rosrun dynamic_reconfigure dynparam set /move_base/HATebLocalPlannerROS 
+										'{'weight_agent_robot_safety': 5.0, 'visibility_cost_threshold': 2.0, 'use_external_prediction': False,
+										'rel_vel_cost_threshold': 1.8, 'min_agent_robot_dist': 0.8, 'predict_agent_behind_robot': False,
+										'invisible_human_threshold': 0.4}'"/>
+		</group>
+  	</group>
+
+	<!-- For inhus -->
+	<group if="$(eval 'appear'==arg('scene'))">
+		<param name="device" command="rosrun dynamic_reconfigure dynparam set /human1/move_base/global_costmap/inflater inflation_radius 0.2"/>
+		<param name="device" command="rosrun dynamic_reconfigure dynparam set /human1/move_base/local_costmap/inflater inflation_radius 0.3"/>
+	</group>
+
+	<param name="device" command="rosrun dynamic_reconfigure dynparam set /human1/move_base/HATebLocalPlannerROS '{'max_vel_x': 0.4, 'max_vel_y': 0.2}'" if="$(eval 'overtake'==arg('scene'))"/>
+	<param name="device" command="rosrun dynamic_reconfigure dynparam set /human1/move_base/HATebLocalPlannerROS '{'max_vel_x': 0.9, 'max_vel_y': 0.6}'" if="$(eval 'cross'==arg('scene'))"/>
+</launch>

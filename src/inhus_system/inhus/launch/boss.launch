@@ -13,5 +13,4 @@
 
 		<param name="map_name" value="$(arg map_name)"/>
 	</node>
-
 </launch>
