@@ -1,5 +1,4 @@
 from os import times
-import os
 from bokeh.io import curdoc
 from bokeh.layouts import layout, column, row
 from bokeh.models import HoverTool, WheelZoomTool
@@ -13,16 +12,12 @@ from bokeh.themes import built_in_themes
 import sys
 import numpy as np
 import math
-import csv
-
 
 absolute_path = ""
 map_name = "passage_hri"
 if len(sys.argv) >= 3:
     absolute_path = sys.argv[1] + "/"
     map_name = sys.argv[2]
-
-dir_path = os.path.dirname(os.path.realpath(__file__))
 
 ######################################################################################################
 ######################################################################################################
@@ -123,8 +118,7 @@ max_rel_vel = 0
 ############
 
 def findIndexWithVal(list, val, f_i):
-    margin = 0.08
-    # print(len(list))
+    margin = 0.05
     if len(list)==0:
         return None
     else:
@@ -132,7 +126,7 @@ def findIndexWithVal(list, val, f_i):
         if list[m] >= val-margin and list[m] <= val+margin:
             return f_i+m
         elif val < list[m]-margin:
-            return findIndexWithVal(list[:m], val, f_i)
+            return findIndexWithVal(list[:m-1], val, f_i)
         elif val > list[m]+margin:
             return findIndexWithVal(list[m+1:], val, f_i+m+1)
 
@@ -199,7 +193,7 @@ def updateFigureRange(min_x=None, max_x=None):
         p4.x_range.start=min_x
         p4.x_range.end=max_x
 
-    # updateMetrics(min_x, max_x)
+    updateMetrics(min_x, max_x)
     text_metrics = "Danger: {:.2f}\n".format(cost_danger_max)\
                 + "Passby: {:.2f}\n".format(cost_passby_max)\
                 + "Visible: {:.2f}\n".format(cost_visible_max)\
@@ -247,19 +241,6 @@ def updateMetrics(min_x, max_x):
     else:
         cost_react_max = -10
 
-
-    # idx_min = vel_h_time.index(min(vel_h_time, key=lambda x:abs(x-min_x)))
-    # idx_max = vel_h_time.index(min(vel_h_time, key=lambda x:abs(x-max_x)))
-
-    # print(dir_path)
-    # name = dir_path+"/data_"+str(min_x)+"_"+str(max_x)+".csv"
-    # with open(name, 'w') as myfile:
-    #   wr = csv.writer(myfile, quoting=csv.QUOTE_ALL)
-    #   wr.writerow(vel_h_time[idx_min:idx_max])
-    #   wr.writerow(vel_h_data[idx_min:idx_max])
-    #   wr.writerow(vel_r_data[idx_min:idx_max])
-
-
 def updateMapper():
     global mapper
     mapper.low = t_min_g
@@ -267,21 +248,9 @@ def updateMapper():
 
 def updateFilters():
     global view_h
-    global view_h2
     global view_r
 
     date_filter_h = CustomJSFilter(args=dict(t_min_g=t_min_g, t_max_g=t_max_g, source_data=path_H_source,), code="""
-    let start=t_min_g
-    let end=t_max_g;
-    let dates = source_data.data['stamp'];
-    let indices = [];
-    for (var i = 0; i <= dates.length; i++){
-        if (dates[i] >= start && dates[i] <= end) indices.push(i);
-    }
-    return indices;
-    """)
-
-    date_filter_h2 = CustomJSFilter(args=dict(t_min_g=t_min_g, t_max_g=t_max_g, source_data=path_H2_source,), code="""
     let start=t_min_g
     let end=t_max_g;
     let dates = source_data.data['stamp'];
@@ -304,7 +273,6 @@ def updateFilters():
     """)
 
     view_h.filters = [resol_filter_h, date_filter_h]
-    view_h2.filters = [resol_filter_h2, date_filter_h2]
     view_r.filters = [resol_filter_r, date_filter_r]
 
 ######################################################################################################
@@ -568,8 +536,8 @@ p2.toolbar.autohide = False
 p2.toolbar_location = 'left'
 p2.add_tools(HoverTool(tooltips=TOOLTIPS))
 p2.yaxis.axis_label = "cost_danger/ cost_passby"
-c_danger = p2.line('x', 'y', source=c_danger_source, line_width=3, color='red', muted_alpha=muted_alpha, legend_label="c_danger")
-c_passby = p2.line('x', 'y', source=c_passby_source, line_width=3, color='blue', muted_alpha=muted_alpha, legend_label="c_passby")
+c_danger = p2.circle('x', 'y', source=c_danger_source, line_width=3, color='red', muted_alpha=muted_alpha, legend_label="c_danger")
+c_passby = p2.circle('x', 'y', source=c_passby_source, line_width=3, color='blue', muted_alpha=muted_alpha, legend_label="c_passby")
 p2.legend.visible=False
 p2.legend.margin = margin
 p2.legend.click_policy=default_click_policy
@@ -580,8 +548,8 @@ p3.toolbar.autohide = False
 p3.toolbar_location = 'left'
 p3.add_tools(HoverTool(tooltips=TOOLTIPS))
 p3.yaxis.axis_label = "cost_react/ cost_surprise"
-c_react = p3.line('x', 'y', source=c_react_source, line_width=3, color='blue', muted_alpha=muted_alpha, legend_label="c_react")
-c_surprise = p3.line('x', 'y', source=c_surprise_source, line_width=3, color='red', muted_alpha=muted_alpha, legend_label="c_surprise")
+c_react = p3.circle('x', 'y', source=c_react_source, line_width=3, color='blue', muted_alpha=muted_alpha, legend_label="c_react")
+c_surprise = p3.circle('x', 'y', source=c_surprise_source, line_width=3, color='red', muted_alpha=muted_alpha, legend_label="c_surprise")
 p3.legend.visible=False
 p3.legend.margin = margin
 p3.legend.click_policy=default_click_policy
@@ -618,12 +586,6 @@ path_H_x = []
 path_H_y = []
 path_H_theta = []
 path_H_source = ColumnDataSource()
-
-path_H2_stamp = []
-path_H2_x = []
-path_H2_y = []
-path_H2_theta = []
-path_H2_source = ColumnDataSource()
 
 path_R_stamp = []
 path_R_x = []
@@ -706,11 +668,6 @@ def readPoseData():
     path_H_y.clear()
     path_H_theta.clear()
 
-    path_H2_stamp.clear()
-    path_H2_x.clear()
-    path_H2_y.clear()
-    path_H2_theta.clear()
-
     path_R_stamp.clear()
     path_R_x.clear()
     path_R_y.clear()
@@ -737,12 +694,6 @@ def readPoseData():
                 path_H_y.append(math.sin(img_angle)*px + math.cos(img_angle)*py)
                 path_H_theta.append(float(mylist[5])+img_angle)
 
-            if mylist[2] == 'H2':
-                path_H2_stamp.append(float(mylist[0]))
-                path_H2_x.append(math.cos(img_angle)*px - math.sin(img_angle)*py)
-                path_H2_y.append(math.sin(img_angle)*px + math.cos(img_angle)*py)
-                path_H2_theta.append(float(mylist[5])+img_angle)
-
             elif mylist[2] == 'R':
                 path_R_stamp.append(float(mylist[0]))
                 path_R_x.append(math.cos(img_angle)*px - math.sin(img_angle)*py)
@@ -750,34 +701,8 @@ def readPoseData():
                 path_R_theta.append(float(mylist[5])+img_angle)
     f.close()
 
-    ### Clean the data for H2 here
-    cleanDataH2()
-
-def cleanDataH2():
-    global path_H2_stamp
-    global path_H2_x
-    global path_H2_y
-    global path_H2_theta
-
-    path_H2_stamp_t = []
-    path_H2_x_t = []
-    path_H2_y_t = []
-    path_H2_theta_t = []
-    for time in path_H_stamp:
-      idx = findIndexWithVal(path_H2_stamp, time, 0)
-      path_H2_stamp_t.append(path_H2_stamp[idx])
-      path_H2_x_t.append(path_H2_x[idx])
-      path_H2_y_t.append(path_H2_y[idx])
-      path_H2_theta_t.append(path_H2_theta[idx])
-
-    path_H2_stamp = path_H2_stamp_t
-    path_H2_x = path_H2_x_t
-    path_H2_y = path_H2_y_t
-    path_H2_theta = path_H2_theta_t
-
 def updatePoseSource():
     path_H_source.data = dict(x=path_H_x, y=path_H_y, theta=path_H_theta, stamp=path_H_stamp)
-    path_H2_source.data = dict(x=path_H2_x, y=path_H2_y, theta=path_H2_theta, stamp=path_H2_stamp)
     path_R_source.data = dict(x=path_R_x, y=path_R_y, theta=path_R_theta, stamp=path_R_stamp)
 
 #########################
@@ -789,11 +714,9 @@ readPathData()
 
 resol = 1
 resol_filter_h = IndexFilter(np.arange(0, len(path_H_source.data["x"]), resol))
-resol_filter_h2 = IndexFilter(np.arange(0, len(path_H2_source.data["x"]), resol))
 resol_filter_r = IndexFilter(np.arange(0, len(path_R_source.data["x"]), resol))
 
 view_h = CDSView(source=path_H_source, filters=[])
-view_h2 = CDSView(source=path_H2_source, filters=[])
 view_r = CDSView(source=path_R_source, filters=[])
 updateFilters()
 
@@ -802,10 +725,9 @@ colors = {'field': 'stamp', 'transform': mapper}
 
 TOOLTIPS_BIS = [("index", "$index"), ("time", "@stamp")]
 hover_h_source = ColumnDataSource(dict(x=[], y=[], theta=[], stamp=[]))
-hover_h2_source = ColumnDataSource(dict(x=[], y=[], theta=[], stamp=[]))
 hover_r_source = ColumnDataSource(dict(x=[], y=[], theta=[], stamp=[]))
 previous_source = ColumnDataSource({'x':[0], 'y':[0]})
-hover_pathCB = CustomJS(args=dict(hover_h_source=hover_h_source, hover_h2_source=hover_h2_source, hover_r_source=hover_r_source, path_H_source=path_H_source, path_H2_source=path_H2_source, path_R_source=path_R_source, previous_len=previous_source), code="""
+hover_pathCB = CustomJS(args=dict(hover_h_source=hover_h_source, hover_r_source=hover_r_source, path_H_source=path_H_source, path_R_source=path_R_source, previous_len=previous_source), code="""
     let indices = cb_data['index'].indices
     if(indices.length > 0)
     {
@@ -819,15 +741,6 @@ hover_pathCB = CustomJS(args=dict(hover_h_source=hover_h_source, hover_h2_source
         }
         hover_h_source.data = data_h
         hover_h_source.change.emit()
-
-        let data_h2 = {
-        'x':[path_H2_source.data['x'][index]],
-        'y':[path_H2_source.data['y'][index]],
-        'theta':[path_H2_source.data['theta'][index]-1.571],
-        'stamp':[path_H2_source.data['stamp'][index]]
-        }
-        hover_h2_source.data = data_h2
-        hover_h2_source.change.emit()
 
         let data_r = {
         'x':[path_R_source.data['x'][index]],
@@ -845,17 +758,15 @@ hover_pathCB = CustomJS(args=dict(hover_h_source=hover_h_source, hover_h2_source
         {
             let data = {'x':[], 'y':[], 'theta':[], 'stamp':[]}
             hover_h_source.data = data
-            hover_h2_source.data = data
             hover_r_source.data = data
             hover_h_source.change.emit()
-            hover_h2_source.change.emit()
             hover_r_source.change.emit()
         }
     }
     previous_len.data['x'][0] = indices.length
     previous_len.change.emit()
     """)
-hover_path_tool = HoverTool(tooltips=None, names=["path_h", "path_r", "path_h2"], callback = hover_pathCB)
+hover_path_tool = HoverTool(tooltips=None, names=["path_h", "path_r"], callback = hover_pathCB)
 
 radius_agents = 0.1
 p_path = figure(tools="pan,wheel_zoom,save,reset", active_scroll="wheel_zoom", match_aspect=True, frame_width=max_img_x, frame_height=max_img_y-60, output_backend="webgl")
@@ -864,12 +775,9 @@ p_path.toolbar_location = 'below'
 p_path.add_tools(hover_path_tool)
 map_img = p_path.image_url(url=['gui_server/static/' + img_file], anchor='center', angle=img_angle, x=img_offset[0], y=img_offset[1], w=img_size[0]*img_resolution, h=img_size[1]*img_resolution)
 path_H = p_path.circle('x', 'y', source=path_H_source, name="path_h", color=colors, radius=radius_agents, muted_alpha=muted_alpha, legend_label="path H", view=view_h)
-path_H2 = p_path.circle('x', 'y', source=path_H2_source, name="path_h2", color=colors, radius=radius_agents, muted_alpha=muted_alpha, legend_label="path H2", view=view_h2)
 path_R = p_path.circle('x', 'y', source=path_R_source, name="path_r", color=colors, radius=radius_agents, muted_alpha=muted_alpha, legend_label="path R", view=view_r)
 highlight_h = p_path.triangle('x', 'y', source=hover_h_source, color=colors, angle="theta", angle_units='rad', size=30, line_color="black", line_width=3)
-highlight_h = p_path.triangle('x', 'y', source=hover_h2_source, color=colors, angle="theta", angle_units='rad', size=30, line_color="black", line_width=3)
 highlight_r = p_path.triangle('x', 'y', source=hover_r_source, color=colors, angle="theta", angle_units='rad', size=30, line_color="black")
-# highlight_r = p_path.image('x', 'y', source=hover_r_source, color=colors, angle="theta", angle_units='rad', size=30, line_color="black")
 p_path.legend.click_policy = "hide"
 
 color_bar = ColorBar(title="Time (s)", color_mapper=mapper, width=8)
@@ -1168,13 +1076,6 @@ def play_buttonCBp():
     'stamp':[path_H_source.data['stamp'][i_play]]
     }
 
-    hover_h2_source.data = {
-    'x':[path_H2_source.data['x'][i_play]],
-    'y':[path_H2_source.data['y'][i_play]],
-    'theta':[path_H2_source.data['theta'][i_play]-1.571],
-    'stamp':[path_H2_source.data['stamp'][i_play]]
-    }
-
     hover_r_source.data = {
     'x':[path_R_source.data['x'][i_play]],
     'y':[path_R_source.data['y'][i_play]],
@@ -1186,7 +1087,6 @@ def play_buttonCBp():
     if i_play > i_max_play:
         hover_r_source.data = {'x':[], 'y':[], 'theta':[], 'stamp':[]}
         hover_h_source.data = {'x':[], 'y':[], 'theta':[], 'stamp':[]}
-        hover_h2_source.data = {'x':[], 'y':[], 'theta':[], 'stamp':[]}
         playing = False
         hover_path_tool.callback = hover_pathCB
         curdoc().remove_periodic_callback(periodic_cb)
@@ -1203,12 +1103,11 @@ def play_buttonCB(event):
     if playing:
         hover_r_source.data = {'x':[], 'y':[], 'theta':[], 'stamp':[]}
         hover_h_source.data = {'x':[], 'y':[], 'theta':[], 'stamp':[]}
-        hover_h2_source.data = {'x':[], 'y':[], 'theta':[], 'stamp':[]}
         if periodic_cb!=None:
             curdoc().remove_periodic_callback(periodic_cb)
 
-    i_min_play=findIndexWithVal(path_H2_source.data["stamp"], t_min_g, 0)
-    i_max_play=findIndexWithVal(path_H2_source.data["stamp"], t_max_g, 0)
+    i_min_play=findIndexWithVal(path_H_source.data["stamp"], t_min_g, 0)
+    i_max_play=findIndexWithVal(path_H_source.data["stamp"], t_max_g, 0)
     i_play = i_min_play
 
     playing = True
@@ -1253,7 +1152,6 @@ def stop_play_buttonCB(event):
     if playing:
         hover_r_source.data = {'x':[], 'y':[], 'theta':[], 'stamp':[]}
         hover_h_source.data = {'x':[], 'y':[], 'theta':[], 'stamp':[]}
-        hover_h2_source.data = {'x':[], 'y':[], 'theta':[], 'stamp':[]}
         playing = False
         hover_path_tool.callback = hover_pathCB
         if periodic_cb!=None:
