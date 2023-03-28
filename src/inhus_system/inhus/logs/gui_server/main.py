@@ -199,10 +199,12 @@ def updateFigureRange(min_x=None, max_x=None):
         p4.x_range.start=min_x
         p4.x_range.end=max_x
 
-    for i in range(0,5):
-        max_x = min_x + 26 
-        updateMetrics(min_x, max_x)
-        min_x += 26
+    # for i in range(0,5):
+    #     max_x = min_x + 26 
+    #     updateMetrics(min_x, max_x)
+    #     min_x += 26
+    
+    updateMetrics(min_x, max_x, False)
 
     text_metrics = "Danger: {:.2f}\n".format(cost_danger_max)\
                 + "Passby: {:.2f}\n".format(cost_passby_max)\
@@ -213,13 +215,15 @@ def updateFigureRange(min_x=None, max_x=None):
 
     metrics_pretext.text=init_text_metrics_pretext + text_metrics
 
-def updateMetrics(min_x, max_x):
+def updateMetrics(min_x, max_x, save):
     global cost_danger_max, cost_passby_max, cost_visible_max, cost_surprise_max, cost_react_max
 
     idx_min = c_danger_time.index(min(c_danger_time, key=lambda x:abs(x-min_x)))
     idx_max = c_danger_time.index(min(c_danger_time, key=lambda x:abs(x-max_x)))
     if(idx_min!=idx_max):
         cost_danger_max = max(c_danger_data[idx_min:idx_max])
+        print(c_danger_data.index(cost_danger_max))
+        print(c_danger_time[c_danger_data.index(cost_danger_max)])
     else:
         cost_danger_max = -10
 
@@ -255,13 +259,15 @@ def updateMetrics(min_x, max_x):
     idx_min = vel_h_time.index(min(vel_h_time, key=lambda x:abs(x-min_x)))
     idx_max = vel_h_time.index(min(vel_h_time, key=lambda x:abs(x-max_x)))
 
-    print(dir_path)
-    name = dir_path+"/data_"+str(min_x)+"_"+str(max_x)+".csv"
-    with open(name, 'w') as myfile:
-      wr = csv.writer(myfile, quoting=csv.QUOTE_ALL)
-      wr.writerow(vel_h_time[idx_min:idx_max])
-      wr.writerow(vel_h_data[idx_min:idx_max])
-      wr.writerow(vel_r_data[idx_min:idx_max])
+    if(save):
+        print('Savig files..')
+        name = dir_path+"/data_"+str(min_x)+"_"+str(max_x)+".csv"
+        with open(name, 'w') as myfile:
+            wr = csv.writer(myfile, quoting=csv.QUOTE_ALL)
+            wr.writerow(vel_h_time[idx_min:idx_max])
+            wr.writerow(vel_h_data[idx_min:idx_max])
+            wr.writerow(vel_r_data[idx_min:idx_max])
+        print('Saved files')
 
 
 def updateMapper():
@@ -533,7 +539,7 @@ p4.extra_y_ranges = {"foo": Range1d(start=0, end=max_vel)}
 p4.add_layout(LinearAxis(y_range_name="foo", axis_label="Speeds (m/s)"), 'right')
 dist = p4.line('x', 'y', source=dist_source, line_width=3, color='gray', muted_alpha=muted_alpha, line_dash="dashed", legend_label="distance", )
 vel_h = p4.line('x', 'y', source=vel_h_source, line_width=3, color='blue', muted_alpha=muted_alpha, y_range_name="foo", legend_label="speed h")
-vel_r = p4.line('x', 'y', source=vel_r_source, line_width=3, color='red', muted_alpha=muted_alpha, y_range_name="foo", legend_label="speed r")
+vel_r = p4.circle('x', 'y', source=vel_r_source, line_width=3, color='red', muted_alpha=muted_alpha, y_range_name="foo", legend_label="speed r")
 p4.legend.visible=False
 p4.legend.margin = margin
 p4.legend.click_policy=default_click_policy
@@ -561,7 +567,7 @@ p1.toolbar.autohide = False
 p1.toolbar_location = 'left'
 p1.add_tools(HoverTool(tooltips=TOOLTIPS))
 p1.yaxis.axis_label = "cost_visibility"
-c_vis = p1.line('x', 'y', source=c_visible_source, line_width=3, color='blue', muted_alpha=muted_alpha, legend_label="c_visible")
+c_vis = p1.circle('x', 'y', source=c_visible_source, line_width=3, color='blue', muted_alpha=muted_alpha, legend_label="c_visible")
 p1.legend.visible=False
 p1.legend.margin = margin
 p1.legend.click_policy=default_click_policy
@@ -572,8 +578,8 @@ p2.toolbar.autohide = False
 p2.toolbar_location = 'left'
 p2.add_tools(HoverTool(tooltips=TOOLTIPS))
 p2.yaxis.axis_label = "cost_danger/ cost_passby"
-c_danger = p2.line('x', 'y', source=c_danger_source, line_width=3, color='red', muted_alpha=muted_alpha, legend_label="c_danger")
-c_passby = p2.line('x', 'y', source=c_passby_source, line_width=3, color='blue', muted_alpha=muted_alpha, legend_label="c_passby")
+c_danger = p2.circle('x', 'y', source=c_danger_source, line_width=3, color='red', muted_alpha=muted_alpha, legend_label="c_danger")
+c_passby = p2.circle('x', 'y', source=c_passby_source, line_width=3, color='blue', muted_alpha=muted_alpha, legend_label="c_passby")
 p2.legend.visible=False
 p2.legend.margin = margin
 p2.legend.click_policy=default_click_policy
@@ -584,8 +590,8 @@ p3.toolbar.autohide = False
 p3.toolbar_location = 'left'
 p3.add_tools(HoverTool(tooltips=TOOLTIPS))
 p3.yaxis.axis_label = "cost_react/ cost_surprise"
-c_react = p3.line('x', 'y', source=c_react_source, line_width=3, color='blue', muted_alpha=muted_alpha, legend_label="c_react")
-c_surprise = p3.line('x', 'y', source=c_surprise_source, line_width=3, color='red', muted_alpha=muted_alpha, legend_label="c_surprise")
+c_react = p3.circle('x', 'y', source=c_react_source, line_width=3, color='blue', muted_alpha=muted_alpha, legend_label="c_react")
+c_surprise = p3.circle('x', 'y', source=c_surprise_source, line_width=3, color='red', muted_alpha=muted_alpha, legend_label="c_surprise")
 p3.legend.visible=False
 p3.legend.margin = margin
 p3.legend.click_policy=default_click_policy
@@ -1131,6 +1137,30 @@ reset_button.js_on_click(CustomJS(args=dict(p1=p1, p2=p2, p3=p3, p4=p4),
     """))
 
 # Button Reset Plots Range
+save_button = Button(label="Save", button_type="primary", width_policy="min", align="center")
+
+def save_buttonCB(event):
+    t_min=None
+    t_max=None
+    try:
+        t_min=float(t_min_input.value)
+    except:
+        print("reset range min wrong input ...")
+    try:
+        t_max=float(t_max_input.value)
+    except:
+        print("reset range max wrong input ...")
+
+    for i in range(0,5):
+        t_max = t_min + 26 
+        updateMetrics(t_min, t_max, True)
+        t_min += 26    
+    
+
+save_button.on_click(save_buttonCB)
+    
+
+# Button Reset Plots Range
 reset_range_button = Button(label="Reset plots with range", button_type="primary", width_policy="min", align="center")
 def reset_range_buttonCB(event):
     t_min=None
@@ -1294,7 +1324,7 @@ plot_size_column = column(plot_size_div, height_slider, width_slider, reset_plot
 legend_column = column(legend_div, show_legend_button, hide_mute_button_div, hide_mute_button)
 other_column = column(other_div, reset_button, set_range_mvt_button)
 t_range = row(column(t_min_input, row(t_min_minus_button, t_min_plus_button, align='center')), column(t_max_input, row(t_max_minus_button, t_max_plus_button, align='center')))
-range_column = column(range_div, t_range, reset_range_button)
+range_column = column(range_div, t_range, reset_range_button, save_button)
 first_row_graph = row(plot_size_column, legend_column, range_column, other_column)
 graph_column = column(first_row_graph, p1, p2, p3, p4, metrics_pretext)
 anim_row = row(play_button, column(pause_button, resume_button, align="center"), stop_play_button, align="center")

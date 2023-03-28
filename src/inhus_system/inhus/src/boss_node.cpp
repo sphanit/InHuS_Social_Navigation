@@ -737,7 +737,8 @@ void Boss::askScenario()
 
 			}
 		}
-		wait(26.0);
+		if(repeat>0)
+			wait(26.0);
 		if(choice_init==1)
 			choice_init=2;
 		else if(choice_init==2)

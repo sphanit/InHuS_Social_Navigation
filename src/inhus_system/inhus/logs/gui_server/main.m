@@ -1,10 +1,10 @@
 clear all;
 close all;
 
-data = readtable('data_254.0_280.0.csv');
-time = (data{1,:})';
-vel_h = (data{2,:})';
-vel_r = (data{3,:})';
+data = readtable('data_350.0_376.0.csv');
+time = str2double(data{1,:})';
+vel_h = str2double(data{2,:})';
+vel_r = str2double(data{3,:})';
 
 % yyaxis left;
 plot(time-time(1),vel_h,'b','LineWidth',2);
