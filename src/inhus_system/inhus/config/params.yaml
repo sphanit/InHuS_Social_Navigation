@@ -29,7 +29,7 @@ humanBehaviorModel_node: ##
     #=> perturbate cmd_vel 0.2 <=> +/- 20% of cmd_vel value
 
 ### Check see robot
-  fov: 180
+  fov: 120 # Human FOV updated
     #=> field of view of the human in degrees and in [180;-180]
   check_see_robot_freq: 5.0
     #=> frequence at which the human checks if he sees the robot
@@ -41,14 +41,14 @@ humanBehaviorModel_node: ##
 
 ### TTC
   human_radius: 0.3
-  robot_radius: 0.3
+  robot_radius: 0.47 
   dist_radius_inflation: 10
     #=> radius of both human and robot to compute TTC (Time To Collision)
 
 ### Surprise
-  surprise_full_increase_durr : 1.0
+  surprise_full_increase_durr : 0.6 # Reaction time of 600ms
   surprise_full_decrease_durr : 2.0
-  surprise_dist : 2.0
+  surprise_dist : 1.6 # Also the proxemics distance
 
 ###############
 ## Attitudes ##

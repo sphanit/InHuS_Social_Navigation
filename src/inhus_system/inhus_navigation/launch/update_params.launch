@@ -19,15 +19,15 @@
 		<!-- For all scenes except appear -->
 		<group unless="$(eval 'appear'==arg('scene'))">
 			<param name="device" command="rosrun dynamic_reconfigure dynparam set /move_base/HATebLocalPlannerROS 
-										'{'weight_agent_robot_safety': 5.0, 'visibility_cost_threshold': 1.0, 'use_external_prediction': False,
-										'rel_vel_cost_threshold': 1.2, 'min_agent_robot_dist': 1.4, 'predict_agent_behind_robot': False}'"/>
+										'{'weight_agent_robot_safety': 5.0, 'visibility_cost_threshold': 0.5, 'use_external_prediction': False,
+										'rel_vel_cost_threshold': 1.2, 'min_agent_robot_dist': 1.4, 'predict_agent_behind_robot': False, fov: 60.0}'"/>
 		</group>
 		<!-- For appear scene -->
 		<group if="$(eval 'appear'==arg('scene'))">
 			<param name="device" command="rosrun dynamic_reconfigure dynparam set /move_base/HATebLocalPlannerROS 
 										'{'weight_agent_robot_safety': 5.0, 'visibility_cost_threshold': 2.0, 'use_external_prediction': False,
 										'rel_vel_cost_threshold': 1.8, 'min_agent_robot_dist': 0.8, 'predict_agent_behind_robot': False,
-										'invisible_human_threshold': 0.4}'"/>
+										'invisible_human_threshold': 0.4, fov: 60.0}'"/>
 		</group>
   	</group>
 
