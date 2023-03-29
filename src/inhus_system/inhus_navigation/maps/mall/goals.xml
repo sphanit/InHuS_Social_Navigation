@@ -43,7 +43,7 @@
     <cross>
       <init_h type="pose_goal" x="18.0" y="5.0" theta="3.14" radius="0.0"/>
       <goal_h type="pose_goal" x="10.0" y="5.0" theta="3.14" radius="0.0"/>
-      <init_r type="pose_goal" x="11.0" y="5.0" theta="0.0" radius="0.0"/>
+      <init_r type="pose_goal" x="11.0" y="5.1" theta="0.0" radius="0.0"/>
       <goal_r type="pose_goal" x="19.0" y="5.0" theta="0.0" radius="0.0"/>
     </cross>
 

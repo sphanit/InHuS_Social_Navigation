@@ -539,7 +539,7 @@ p4.extra_y_ranges = {"foo": Range1d(start=0, end=max_vel)}
 p4.add_layout(LinearAxis(y_range_name="foo", axis_label="Speeds (m/s)"), 'right')
 dist = p4.line('x', 'y', source=dist_source, line_width=3, color='gray', muted_alpha=muted_alpha, line_dash="dashed", legend_label="distance", )
 vel_h = p4.line('x', 'y', source=vel_h_source, line_width=3, color='blue', muted_alpha=muted_alpha, y_range_name="foo", legend_label="speed h")
-vel_r = p4.circle('x', 'y', source=vel_r_source, line_width=3, color='red', muted_alpha=muted_alpha, y_range_name="foo", legend_label="speed r")
+vel_r = p4.line('x', 'y', source=vel_r_source, line_width=3, color='red', muted_alpha=muted_alpha, y_range_name="foo", legend_label="speed r")
 p4.legend.visible=False
 p4.legend.margin = margin
 p4.legend.click_policy=default_click_policy

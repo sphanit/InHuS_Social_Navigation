@@ -17,10 +17,18 @@
 			<param name="device" command="rosrun dynamic_reconfigure dynparam set /move_base/global_costmap/human_layer_static radius 2.0"/>	
 		</group>
 		<!-- For all scenes except appear -->
-		<group unless="$(eval 'appear'==arg('scene'))">
+		<group if="$(eval 'overtake'==arg('scene'))">
 			<param name="device" command="rosrun dynamic_reconfigure dynparam set /move_base/HATebLocalPlannerROS 
 										'{'weight_agent_robot_safety': 5.0, 'visibility_cost_threshold': 0.5, 'use_external_prediction': False,
 										'rel_vel_cost_threshold': 1.2, 'min_agent_robot_dist': 1.4, 'predict_agent_behind_robot': False, fov: 60.0}'"/>
+
+		</group>
+
+		<group if="$(eval 'cross'==arg('scene'))">
+		<param name="device" command="rosrun dynamic_reconfigure dynparam set /move_base/HATebLocalPlannerROS 
+										'{'weight_agent_robot_safety': 5.0, 'visibility_cost_threshold': 0.5, 'use_external_prediction': False, 'max_vel_theta': 2.0,
+										'rel_vel_cost_threshold': 1.2, 'min_agent_robot_dist': 1.4, 'predict_agent_behind_robot': False, fov: 60.0}'" />
+
 		</group>
 		<!-- For appear scene -->
 		<group if="$(eval 'appear'==arg('scene'))">
