@@ -1290,15 +1290,15 @@ void HumanBehaviorModel::computeSurprise()
 
 
 	}
-	else
-	{
-		// std::cout << "not_seen ";
+	// else
+	// {
+	// 	// std::cout << "not_seen ";
 
-		// slowly decrease the seen_ratio
-		surprise_seen_ratio_ -= delta_t.toSec()/surprise_full_decrease_durr_.toSec();
-		if(surprise_seen_ratio_ < 0.0)
-			surprise_seen_ratio_ = 0.0;
-	}
+	// 	// slowly decrease the seen_ratio
+	// 	surprise_seen_ratio_ -= delta_t.toSec()/surprise_full_decrease_durr_.toSec();
+	// 	if(surprise_seen_ratio_ < 0.0)
+	// 		surprise_seen_ratio_ = 0.0;
+	// }
 
 	// std::cout << "ratio=" << surprise_seen_ratio_ << std::endl;
 

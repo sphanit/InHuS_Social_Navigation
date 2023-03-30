@@ -267,6 +267,10 @@ def updateMetrics(min_x, max_x, save):
             wr.writerow(vel_h_time[idx_min:idx_max])
             wr.writerow(vel_h_data[idx_min:idx_max])
             wr.writerow(vel_r_data[idx_min:idx_max])
+        name = dir_path+"/data_metrics_"+str(min_x)+"_"+str(max_x)+".csv"
+        with open(name, 'w') as myfile:
+            wr = csv.writer(myfile, quoting=csv.QUOTE_ALL)
+            wr.writerow([cost_danger_max, cost_passby_max, cost_visible_max, cost_surprise_max, cost_react_max])
         print('Saved files')
 
 
@@ -1151,10 +1155,12 @@ def save_buttonCB(event):
     except:
         print("reset range max wrong input ...")
 
+    # updateMetrics(t_min, t_max, True)
+
     for i in range(0,5):
         t_max = t_min + 26 
         updateMetrics(t_min, t_max, True)
-        t_min += 26    
+        t_min += 53    
     
 
 save_button.on_click(save_buttonCB)
