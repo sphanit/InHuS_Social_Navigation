@@ -27,10 +27,10 @@
   <scenarios>
 
     <appearance>
-      <init_h type="pose_goal" x="25.8" y="21.8" theta="-1.57" radius="0.0"/>
+      <init_h type="pose_goal" x="25.7" y="21.8" theta="-1.57" radius="0.0"/>
       <goal_h type="pose_goal" x="30.5" y="16.6" theta="0.0" radius="0.0"/>
-      <init_r type="pose_goal" x="30.0" y="16.6" theta="-3.14" radius="0.0"/>
-      <goal_r type="pose_goal" x="25.1" y="26" theta="1.57" radius="0.0"/>
+      <init_r type="pose_goal" x="30.0" y="17.2" theta="-3.14" radius="0.0"/>
+      <goal_r type="pose_goal" x="22.2" y="17.2" theta="-3.14" radius="0.0"/>
     </appearance>
 
     <approach>
